@@ -18,7 +18,9 @@ const contentTypes = {
 function getFilePath(urlPath) {
   const decodedPath = decodeURIComponent(urlPath.split("?")[0]);
   const requestedPath = decodedPath === "/" ? "/index.html" : decodedPath;
-  const filePath = path.normalize(path.join(publicDir, requestedPath));
+  const hasExtension = path.extname(requestedPath) !== "";
+  const fileRequestPath = hasExtension ? requestedPath : path.join(requestedPath, "index.html");
+  const filePath = path.normalize(path.join(publicDir, fileRequestPath));
 
   if (!filePath.startsWith(publicDir)) {
     return null;
