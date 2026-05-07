@@ -15,6 +15,30 @@ const contentTypes = {
   ".webp": "image/webp",
 };
 
+function getElapsedMs(startTime) {
+  return Number(process.hrtime.bigint() - startTime) / 1_000_000;
+}
+
+function getDisplayPath(filePath) {
+  if (!filePath) {
+    return "blocked";
+  }
+
+  return `/${path.relative(publicDir, filePath).replaceAll(path.sep, "/")}`;
+}
+
+function logResponse(request, response, filePath, startTime) {
+  const elapsedMs = getElapsedMs(startTime).toFixed(1);
+  const contentType = response.getHeader("Content-Type") || "unknown";
+  const contentLength = response.getHeader("Content-Length");
+  const size = contentLength ? `${contentLength}b` : "unknown-size";
+  const servedPath = getDisplayPath(filePath);
+
+  console.log(
+    `${request.method} ${request.url} -> ${servedPath} ${response.statusCode} ${contentType} ${size} ${elapsedMs}ms`,
+  );
+}
+
 function getFilePath(urlPath) {
   const decodedPath = decodeURIComponent(urlPath.split("?")[0]);
   const requestedPath = decodedPath === "/" ? "/index.html" : decodedPath;
@@ -30,23 +54,32 @@ function getFilePath(urlPath) {
 }
 
 const server = http.createServer((request, response) => {
+  const startTime = process.hrtime.bigint();
   const filePath = getFilePath(request.url || "/");
 
+  response.once("finish", () => logResponse(request, response, filePath, startTime));
+
   if (!filePath) {
-    response.writeHead(403, { "Content-Type": "text/plain; charset=utf-8" });
+    response.statusCode = 403;
+    response.setHeader("Content-Length", Buffer.byteLength("Forbidden"));
+    response.setHeader("Content-Type", "text/plain; charset=utf-8");
     response.end("Forbidden");
     return;
   }
 
   fs.readFile(filePath, (error, contents) => {
     if (error) {
-      response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+      response.statusCode = 404;
+      response.setHeader("Content-Length", Buffer.byteLength("Not found"));
+      response.setHeader("Content-Type", "text/plain; charset=utf-8");
       response.end("Not found");
       return;
     }
 
     const contentType = contentTypes[path.extname(filePath)] || "application/octet-stream";
-    response.writeHead(200, { "Content-Type": contentType });
+    response.statusCode = 200;
+    response.setHeader("Content-Length", contents.length);
+    response.setHeader("Content-Type", contentType);
     response.end(contents);
   });
 });
