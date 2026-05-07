@@ -3,32 +3,37 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Live Abacus Calculator</title>
+    <title>Larry's Playground</title>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
-    <main class="app-shell">
-      <section class="workspace" aria-label="Live abacus calculator">
-        <div class="display-panel">
-          <div>
-            <p class="eyebrow">Live abacus calculator</p>
-            <h1>Abacus</h1>
+    <main class="menu-shell">
+      <section class="playground-menu" aria-label="Larry's Playground page menu">
+        <header class="menu-header">
+          <p class="eyebrow">Choose an experiment</p>
+          <h1>Larry's Playground</h1>
+        </header>
+
+        <nav class="page-grid" aria-label="Playground pages">
+          <a class="page-card abacus-card" href="/abacus/">
+            <span class="card-kicker">Calculator</span>
+            <strong>Abacus</strong>
+            <span>Interactive bead calculator with live numeric readout.</span>
+          </a>
+
+          <div class="page-card ascii-card">
+            <a class="corner-link" href="https://www.yahoo.com/">Terminal Style</a>
+            <a class="card-title-link" href="/ascii-art/">ASCII Art</a>
+            <span>Turn text into chunky display lettering.</span>
           </div>
-          <output id="valueDisplay" class="value-display" aria-live="polite">0</output>
-        </div>
 
-        <div class="controls">
-          <label class="field">
-            <span>Value</span>
-            <input id="numberInput" type="number" min="0" max="999999" step="1" value="0">
-          </label>
-          <button id="clearButton" type="button">Clear</button>
-        </div>
-
-        <div class="abacus" id="abacus" aria-label="Interactive abacus"></div>
+          <a class="page-card altitude-card" href="/altitude-indicator/">
+            <span class="card-kicker">Avionics</span>
+            <strong>Altitude Indicator</strong>
+            <span>Mouse-driven CSS altimeter with animated needles.</span>
+          </a>
+        </nav>
       </section>
     </main>
-
-    <script src="script.js"></script>
   </body>
 </html>
