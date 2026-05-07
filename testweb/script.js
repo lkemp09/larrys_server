@@ -13,6 +13,7 @@ const places = [
 ];
 
 let digits = [0, 0, 0, 0, 0, 0];
+const beadControls = [];
 
 function clampValue(value) {
   if (!Number.isFinite(value)) {
@@ -30,16 +31,19 @@ function digitsToValue(nextDigits) {
   return nextDigits.reduce((sum, digit, index) => sum + digit * places[index].value, 0);
 }
 
-function renderAbacus() {
+function buildAbacus() {
   abacus.innerHTML = "";
+  beadControls.length = 0;
 
-  digits.forEach((digit, placeIndex) => {
+  digits.forEach((_, placeIndex) => {
     const rod = document.createElement("div");
     rod.className = "rod";
+    beadControls[placeIndex] = {};
 
     const upper = document.createElement("div");
     upper.className = "bead-zone upper";
-    const upperBead = createBead(placeIndex, 5, digit >= 5);
+    const upperBead = createBead(placeIndex, 5);
+    beadControls[placeIndex][5] = upperBead;
     upper.append(upperBead);
 
     const divider = document.createElement("div");
@@ -49,7 +53,9 @@ function renderAbacus() {
     lower.className = "bead-zone lower";
 
     for (let beadValue = 1; beadValue <= 4; beadValue += 1) {
-      lower.append(createBead(placeIndex, beadValue, digit % 5 >= beadValue));
+      const lowerBead = createBead(placeIndex, beadValue);
+      beadControls[placeIndex][beadValue] = lowerBead;
+      lower.append(lowerBead);
     }
 
     const label = document.createElement("span");
@@ -61,13 +67,23 @@ function renderAbacus() {
   });
 }
 
-function createBead(placeIndex, beadValue, isActive) {
+function createBead(placeIndex, beadValue) {
   const bead = document.createElement("button");
-  bead.className = `bead${isActive ? " active" : ""}`;
+  bead.className = "bead";
   bead.type = "button";
   bead.setAttribute("aria-label", `${places[placeIndex].label} bead ${beadValue}`);
   bead.addEventListener("click", () => setDigitFromBead(placeIndex, beadValue));
   return bead;
+}
+
+function updateBeads() {
+  digits.forEach((digit, placeIndex) => {
+    beadControls[placeIndex][5].classList.toggle("active", digit >= 5);
+
+    for (let beadValue = 1; beadValue <= 4; beadValue += 1) {
+      beadControls[placeIndex][beadValue].classList.toggle("active", digit % 5 >= beadValue);
+    }
+  });
 }
 
 function setDigitFromBead(placeIndex, beadValue) {
@@ -88,7 +104,7 @@ function syncFromDigits() {
   const value = digitsToValue(digits);
   input.value = value;
   valueDisplay.value = value.toLocaleString("en-US");
-  renderAbacus();
+  updateBeads();
 }
 
 function setValue(value) {
@@ -99,4 +115,5 @@ function setValue(value) {
 input.addEventListener("input", () => setValue(Number(input.value)));
 clearButton.addEventListener("click", () => setValue(0));
 
+buildAbacus();
 setValue(0);
