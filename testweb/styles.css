@@ -167,6 +167,13 @@ h1 {
     var(--surface);
 }
 
+.avionics-card {
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.22)),
+    linear-gradient(135deg, rgba(20, 70, 82, 0.24), rgba(52, 135, 110, 0.2)),
+    var(--surface);
+}
+
 @media (max-width: 920px) {
   .page-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
