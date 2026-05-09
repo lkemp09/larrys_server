@@ -121,40 +121,68 @@
           </div>
 
           <div class="real-panel">
+            <div class="panel-label pilot-label">Pilot panel</div>
+            <div class="panel-screw screw-one"></div>
+            <div class="panel-screw screw-two"></div>
+            <div class="panel-screw screw-three"></div>
+            <div class="panel-screw screw-four"></div>
             <div class="hdx-unit">
+              <div class="unit-screw top-left"></div>
+              <div class="unit-screw top-right"></div>
+              <div class="unit-screw bottom-left"></div>
+              <div class="unit-screw bottom-right"></div>
               <div class="hdx-screen">
                 <div class="hdx-sky"></div>
                 <div class="hdx-ground"></div>
                 <div class="hdx-horizon"></div>
+                <div class="hdx-flight-director"></div>
                 <div class="hdx-speed">120<br>100<br>080</div>
                 <div class="hdx-alt">055<br>045<br>035</div>
                 <div class="hdx-map"></div>
+                <div class="hdx-status">HDG 320&nbsp;&nbsp;ALT 4,500&nbsp;&nbsp;AP READY</div>
                 <strong>Dynon SkyView HDX</strong>
               </div>
               <div class="hdx-controls" aria-hidden="true">
-                <b></b>
-                <b></b>
-                <b></b>
-                <b></b>
-                <b></b>
-                <b></b>
+                <b>NRST</b>
+                <b>MAP</b>
+                <b>FPL</b>
+                <b>HDG</b>
+                <b>BARO</b>
+                <b>MENU</b>
               </div>
             </div>
 
             <div class="stack-column">
               <div class="val-com stack-face">
-                <span>VAL COM</span>
-                <strong>121.500</strong>
-                <small>STBY 122.800</small>
+                <span>VAL Avionics COM</span>
+                <div class="radio-display">
+                  <strong>121.500</strong>
+                  <small>122.800</small>
+                </div>
+                <div class="face-buttons" aria-hidden="true">
+                  <b>VOL</b>
+                  <b>SQL</b>
+                  <b>FLIP</b>
+                </div>
               </div>
               <div class="stratus-esg stack-face">
-                <span>Stratus ESG</span>
-                <strong>1200 ALT</strong>
-                <small>ADS-B OUT</small>
+                <span>Appareo Stratus ESG</span>
+                <div class="xpdr-display">
+                  <strong>1200</strong>
+                  <small>ALT ADS-B OUT</small>
+                </div>
+                <div class="face-buttons xpdr-buttons" aria-hidden="true">
+                  <b>VFR</b>
+                  <b>IDENT</b>
+                  <b>FUNC</b>
+                </div>
               </div>
               <div class="trio-pro stack-face">
                 <span>Trio Pro Pilot</span>
-                <strong>HDG  320</strong>
+                <div class="ap-display">
+                  <strong>HDG 320</strong>
+                  <small>ALT HOLD</small>
+                </div>
                 <div class="trio-buttons" aria-hidden="true">
                   <b>TRK</b>
                   <b>ALT</b>
@@ -165,9 +193,15 @@
 
             <div class="backup-column">
               <div class="g5-unit">
+                <div class="unit-screw top-left"></div>
+                <div class="unit-screw top-right"></div>
+                <div class="unit-screw bottom-left"></div>
+                <div class="unit-screw bottom-right"></div>
                 <div class="g5-sky"></div>
                 <div class="g5-ground"></div>
                 <div class="g5-horizon"></div>
+                <div class="g5-tape left-tape">80<br>90<br>100</div>
+                <div class="g5-tape right-tape">4.4<br>4.5<br>4.6</div>
                 <strong>Garmin G5</strong>
               </div>
               <div class="breaker-row" aria-hidden="true">
@@ -175,6 +209,43 @@
                 <i></i>
                 <i></i>
                 <i></i>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="system-configurator" aria-label="Avionics system price configurator">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Live estimate</p>
+              <h2>Build Your System</h2>
+            </div>
+            <span id="configTotalPill" class="count-pill">$0</span>
+          </div>
+
+          <div class="config-layout">
+            <form id="systemForm" class="config-form"></form>
+
+            <div class="price-panel">
+              <div class="price-summary">
+                <span>Equipment <strong id="equipmentTotal">$0</strong></span>
+                <span>Install <strong id="installTotal">$0</strong></span>
+                <span>Total <strong id="systemTotal">$0</strong></span>
+              </div>
+
+              <div class="table-wrap">
+                <table class="price-table">
+                  <thead>
+                    <tr>
+                      <th>Category</th>
+                      <th>Selection</th>
+                      <th>Equipment</th>
+                      <th>Install</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody id="priceTableBody"></tbody>
+                </table>
               </div>
             </div>
           </div>

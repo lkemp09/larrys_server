@@ -20,6 +20,18 @@ const mfdDisplay = document.querySelector("#mfdDisplay");
 const radioStack = document.querySelector("#radioStack");
 const backupInstrument = document.querySelector("#backupInstrument");
 const autopilotHead = document.querySelector("#autopilotHead");
+const systemForm = document.querySelector("#systemForm");
+const priceTableBody = document.querySelector("#priceTableBody");
+const equipmentTotal = document.querySelector("#equipmentTotal");
+const installTotal = document.querySelector("#installTotal");
+const systemTotal = document.querySelector("#systemTotal");
+const configTotalPill = document.querySelector("#configTotalPill");
+
+const currency = new Intl.NumberFormat("en-US", {
+  maximumFractionDigits: 0,
+  style: "currency",
+  currency: "USD",
+});
 
 const options = [
   {
@@ -229,6 +241,89 @@ const solutionProfiles = {
   },
 };
 
+const configCategories = [
+  {
+    id: "primary",
+    label: "Primary display",
+    defaultChoice: "dynon-hdx",
+    choices: [
+      { id: "dynon-hdx", label: "Dynon SkyView HDX 10-inch", equipment: [12000, 19000], install: [8000, 16000] },
+      { id: "garmin-g3x", label: "Garmin G3X Touch Certified", equipment: [14000, 24000], install: [10000, 20000] },
+      { id: "aspen-e5", label: "Aspen Evolution E5", equipment: [6000, 10000], install: [5000, 10000] },
+      { id: "bendixking-aerovue", label: "BendixKing AeroVue Touch", equipment: [7000, 15000], install: [6000, 14000] },
+      { id: "retain-primary", label: "Retain existing primary instruments", equipment: [0, 0], install: [0, 1500] },
+    ],
+  },
+  {
+    id: "backup",
+    label: "Backup instrument",
+    defaultChoice: "garmin-g5",
+    choices: [
+      { id: "garmin-g5", label: "Garmin G5 backup", equipment: [3000, 5500], install: [2500, 5500] },
+      { id: "garmin-gi275", label: "Garmin GI 275", equipment: [4500, 8500], install: [3000, 7000] },
+      { id: "uavionix-av30", label: "uAvionix AV-30-C", equipment: [2200, 4500], install: [2000, 5000] },
+      { id: "dynon-d30", label: "Dynon D30 standby", equipment: [2500, 4500], install: [2000, 4500] },
+      { id: "none-backup", label: "No backup change", equipment: [0, 0], install: [0, 0] },
+    ],
+  },
+  {
+    id: "navigator",
+    label: "IFR GPS / navigator",
+    defaultChoice: "none-navigator",
+    choices: [
+      { id: "garmin-gps175", label: "Garmin GPS 175", equipment: [5500, 7500], install: [5000, 10000] },
+      { id: "garmin-gnc355", label: "Garmin GNC 355 GPS/COM", equipment: [8000, 10500], install: [6000, 12000] },
+      { id: "garmin-gtn650xi", label: "Garmin GTN 650Xi", equipment: [14000, 18000], install: [8000, 16000] },
+      { id: "avidyne-ifd440", label: "Avidyne IFD 440", equipment: [13000, 17000], install: [7000, 15000] },
+      { id: "none-navigator", label: "Retain existing navigator", equipment: [0, 0], install: [0, 1500] },
+    ],
+  },
+  {
+    id: "com",
+    label: "COM radio",
+    defaultChoice: "val-com",
+    choices: [
+      { id: "val-com", label: "VAL Avionics COM", equipment: [1600, 2800], install: [1800, 4500] },
+      { id: "garmin-gtr200", label: "Garmin GTR 200", equipment: [1800, 3000], install: [1800, 4500] },
+      { id: "trig-ty96", label: "Trig TY96", equipment: [2200, 3400], install: [2000, 5000] },
+      { id: "none-com", label: "Retain existing COM", equipment: [0, 0], install: [0, 1000] },
+    ],
+  },
+  {
+    id: "transponder",
+    label: "Transponder / ADS-B",
+    defaultChoice: "stratus-esg",
+    choices: [
+      { id: "stratus-esg", label: "Appareo Stratus ESG", equipment: [3000, 4500], install: [2500, 5500] },
+      { id: "garmin-gnx375", label: "Garmin GNX 375 GPS/Xpdr", equipment: [8500, 10500], install: [6500, 12500] },
+      { id: "trig-tt31", label: "Trig TT31", equipment: [2500, 4000], install: [2500, 5500] },
+      { id: "none-transponder", label: "Retain existing transponder", equipment: [0, 0], install: [0, 1500] },
+    ],
+  },
+  {
+    id: "autopilot",
+    label: "Autopilot",
+    defaultChoice: "trio-pro",
+    choices: [
+      { id: "trio-pro", label: "Trio Pro Pilot", equipment: [7500, 14000], install: [8000, 18000] },
+      { id: "garmin-gfc500", label: "Garmin GFC 500", equipment: [9000, 18000], install: [10000, 22000] },
+      { id: "dynon-autopilot", label: "Dynon autopilot components", equipment: [5000, 10000], install: [7000, 16000] },
+      { id: "none-autopilot", label: "No autopilot", equipment: [0, 0], install: [0, 0] },
+    ],
+  },
+  {
+    id: "engine",
+    label: "Engine monitor / extras",
+    defaultChoice: "dynon-eis",
+    choices: [
+      { id: "dynon-eis", label: "Dynon engine monitoring", equipment: [2500, 6500], install: [3500, 9000] },
+      { id: "jpi-edm900", label: "JPI EDM 900", equipment: [5500, 8500], install: [4500, 10000] },
+      { id: "ei-cgr30p", label: "Electronics International CGR-30P", equipment: [4500, 7500], install: [4500, 10000] },
+      { id: "none-engine", label: "No engine monitor change", equipment: [0, 0], install: [0, 0] },
+    ],
+  },
+];
+
 function getSettings() {
   return {
     budget: budgetSelect.value,
@@ -411,6 +506,77 @@ function updatePanelVisuals({ primary, navigator, backup, autopilot }) {
   setProductClass(autopilotHead, autopilot);
 }
 
+function formatRange(range) {
+  const [low, high] = range;
+
+  if (low === high) {
+    return currency.format(low);
+  }
+
+  return `${currency.format(low)}-${currency.format(high)}`;
+}
+
+function addRanges(first, second) {
+  return [first[0] + second[0], first[1] + second[1]];
+}
+
+function getChoice(category) {
+  const select = document.querySelector(`#config-${category.id}`);
+  const choiceId = select ? select.value : category.defaultChoice;
+  return category.choices.find((choice) => choice.id === choiceId) || category.choices[0];
+}
+
+function renderConfigurator() {
+  systemForm.innerHTML = configCategories.map((category) => {
+    const optionsMarkup = category.choices.map((choice) => {
+      const selected = choice.id === category.defaultChoice ? " selected" : "";
+      return `<option value="${choice.id}"${selected}>${choice.label}</option>`;
+    }).join("");
+
+    return `
+      <label class="field">
+        <span>${category.label}</span>
+        <select id="config-${category.id}" data-config-select>${optionsMarkup}</select>
+      </label>
+    `;
+  }).join("");
+
+  systemForm.querySelectorAll("[data-config-select]").forEach((select) => {
+    select.addEventListener("change", updateConfigurator);
+  });
+}
+
+function updateConfigurator() {
+  let equipmentRange = [0, 0];
+  let installRange = [0, 0];
+
+  const rows = configCategories.map((category) => {
+    const choice = getChoice(category);
+    const rowTotal = addRanges(choice.equipment, choice.install);
+
+    equipmentRange = addRanges(equipmentRange, choice.equipment);
+    installRange = addRanges(installRange, choice.install);
+
+    return `
+      <tr>
+        <td>${category.label}</td>
+        <td>${choice.label}</td>
+        <td>${formatRange(choice.equipment)}</td>
+        <td>${formatRange(choice.install)}</td>
+        <td>${formatRange(rowTotal)}</td>
+      </tr>
+    `;
+  });
+
+  const totalRange = addRanges(equipmentRange, installRange);
+
+  priceTableBody.innerHTML = rows.join("");
+  equipmentTotal.textContent = formatRange(equipmentRange);
+  installTotal.textContent = formatRange(installRange);
+  systemTotal.textContent = formatRange(totalRange);
+  configTotalPill.textContent = formatRange(totalRange);
+}
+
 function updatePlanner() {
   const settings = getSettings();
   const visibleOptions = getVisibleOptions(settings);
@@ -425,4 +591,6 @@ missionSelect.addEventListener("change", updatePlanner);
 autopilotToggle.addEventListener("change", updatePlanner);
 certifiedToggle.addEventListener("change", updatePlanner);
 
+renderConfigurator();
+updateConfigurator();
 updatePlanner();
