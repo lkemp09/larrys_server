@@ -625,9 +625,343 @@ h2 {
   display: none;
 }
 
+.cockpit-preview {
+  position: relative;
+  isolation: isolate;
+  grid-template-columns: minmax(220px, 1.2fr) minmax(180px, 0.95fr) minmax(148px, 0.66fr);
+  grid-template-rows: 1fr 84px 50px;
+  padding: 30px 18px 18px;
+  border: 4px solid #111820;
+  border-radius: 18px 18px 8px 8px;
+  background:
+    radial-gradient(circle at 9px 9px, #87929a 0 3px, #222b32 4px 6px, transparent 7px) 12px 12px / 84px 84px,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.18), transparent 14% 86%, rgba(0, 0, 0, 0.28)),
+    linear-gradient(180deg, #7e8b93 0, #56636c 36%, #38454f 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -18px 24px rgba(0, 0, 0, 0.34),
+    0 18px 45px rgba(15, 25, 33, 0.22);
+}
+
+.cockpit-preview::before,
+.cockpit-preview::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.cockpit-preview::before {
+  inset: 9px;
+  border: 2px solid rgba(13, 20, 25, 0.55);
+  border-radius: 13px 13px 6px 6px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+}
+
+.cockpit-preview::after {
+  left: 6%;
+  right: 6%;
+  bottom: -18px;
+  height: 22px;
+  border-radius: 0 0 18px 18px;
+  background: linear-gradient(180deg, #202930, #111820);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.18);
+}
+
+.panel-placard {
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  z-index: 1;
+  transform: translateX(-50%);
+  padding: 3px 12px;
+  border-radius: 4px;
+  background: #25313a;
+  color: #f0c46c;
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+    0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.panel-display,
+.stack-unit,
+.round-instrument,
+.engine-strip,
+.autopilot-head {
+  border-color: #0b1116;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 2px rgba(5, 8, 10, 0.9),
+    0 10px 18px rgba(0, 0, 0, 0.2);
+}
+
+.panel-display {
+  border-width: 7px;
+  background: #050b10;
+}
+
+.has-product-photo {
+  background:
+    linear-gradient(180deg, rgba(5, 9, 12, 0.04), rgba(5, 9, 12, 0.12)),
+    var(--product-image) center / contain no-repeat,
+    #f4f5f3;
+}
+
+.panel-display.has-product-photo {
+  background:
+    linear-gradient(180deg, rgba(5, 9, 12, 0.02), rgba(5, 9, 12, 0.1)),
+    var(--product-image) center / contain no-repeat,
+    #f3f4f2;
+}
+
+.panel-display.has-product-photo .sky-band,
+.panel-display.has-product-photo .terrain-band,
+.panel-display.has-product-photo .horizon-line,
+.panel-display.has-product-photo .tape,
+.panel-display.has-product-photo .map-route,
+.panel-display.has-product-photo .map-ring,
+.panel-display.has-product-photo .map-fix,
+.round-instrument.has-product-photo .mini-sky,
+.round-instrument.has-product-photo .mini-ground,
+.round-instrument.has-product-photo .mini-horizon {
+  opacity: 0;
+}
+
+.panel-display.has-product-photo span,
+.panel-display.has-product-photo strong,
+.round-instrument.has-product-photo span {
+  display: inline-block;
+  padding: 3px 7px;
+  border-radius: 4px;
+  background: rgba(8, 13, 17, 0.82);
+}
+
+.panel-display.has-product-photo strong {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 10px;
+  width: fit-content;
+  max-width: calc(100% - 24px);
+  margin: 0 auto;
+}
+
+.panel-display.has-product-photo span {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+}
+
+.pfd-display {
+  padding-inline: 64px;
+}
+
+.pfd-display span,
+.pfd-display strong {
+  display: block;
+  text-align: center;
+}
+
+.mfd-display span,
+.mfd-display strong {
+  max-width: calc(100% - 76px);
+}
+
+.panel-display strong,
+.stack-unit strong {
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.75);
+}
+
+.pfd-display,
+.mfd-display {
+  border-bottom-width: 26px;
+}
+
+.pfd-display::before,
+.mfd-display::before {
+  left: 12px;
+  right: 12px;
+  bottom: -20px;
+  height: 14px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, #aeb7bd 0 26%, #3a454e 28% 52%, transparent 54%) 0 50% / 29px 13px,
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.16), transparent);
+}
+
+.radio-stack {
+  padding: 8px;
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, #222c34, #0e151b);
+  box-shadow:
+    inset 0 0 0 2px #0a0f13,
+    0 10px 18px rgba(0, 0, 0, 0.2);
+}
+
+.radio-stack::before {
+  inset: 3px;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.stack-unit {
+  min-height: 76px;
+  padding: 9px 36px 9px 10px;
+  border-radius: 6px;
+  background:
+    linear-gradient(90deg, #111820 0 17%, #23313a 18% 80%, #0e141a 81%),
+    #101820;
+}
+
+.stack-unit.has-product-photo {
+  background:
+    linear-gradient(90deg, rgba(9, 14, 18, 0.88) 0 22%, rgba(9, 14, 18, 0.18) 23% 76%, rgba(9, 14, 18, 0.86) 77%),
+    var(--product-image) center / contain no-repeat,
+    #f4f5f3;
+}
+
+.stack-unit.has-product-photo span,
+.stack-unit.has-product-photo strong {
+  display: inline-block;
+  width: fit-content;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(8, 13, 17, 0.86);
+}
+
+.stack-unit::before {
+  content: "";
+  position: absolute;
+  right: 10px;
+  top: calc(50% - 12px);
+  width: 24px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, #e1e8ea 0 22%, #606d74 24% 56%, #141c22 58%);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.38);
+}
+
+.stack-unit::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 46px;
+  bottom: 8px;
+  height: 6px;
+  border-radius: 999px;
+  background:
+    repeating-linear-gradient(90deg, #cbd8db 0 8px, transparent 8px 14px);
+  opacity: 0.42;
+}
+
+.audio-unit.product-garmin,
+.navigator-unit.product-garmin,
+.transponder-unit.product-garmin {
+  background:
+    linear-gradient(90deg, #111820 0 17%, #273842 18% 80%, #0e141a 81%),
+    #101820;
+}
+
+.audio-unit.product-trig,
+.transponder-unit.product-trig {
+  background:
+    linear-gradient(90deg, #111820 0 17%, #2e3a44 18% 80%, #0e141a 81%),
+    #101820;
+}
+
+.audio-unit.product-icom {
+  background:
+    linear-gradient(90deg, #111820 0 17%, #273343 18% 80%, #0e141a 81%),
+    #101820;
+}
+
+.transponder-unit.product-appareo {
+  background:
+    linear-gradient(90deg, #111820 0 17%, #2e373b 18% 80%, #0e141a 81%),
+    #101820;
+}
+
+.stack-unit.has-product-photo {
+  background:
+    linear-gradient(90deg, rgba(9, 14, 18, 0.88) 0 22%, rgba(9, 14, 18, 0.18) 23% 76%, rgba(9, 14, 18, 0.86) 77%),
+    var(--product-image) center / contain no-repeat,
+    #f4f5f3;
+}
+
+.standby-cluster {
+  align-items: stretch;
+}
+
+.round-instrument {
+  aspect-ratio: 1;
+  align-self: center;
+  border-width: 8px;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 0 58%, rgba(255, 255, 255, 0.08) 59%, transparent 62%),
+    #111a22;
+}
+
+.round-instrument.has-product-photo {
+  border-radius: 12px;
+  background:
+    var(--product-image) center / contain no-repeat,
+    #f4f5f3;
+}
+
+.round-instrument::before {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.24), transparent 12%),
+    transparent;
+  pointer-events: none;
+}
+
+.engine-strip {
+  border-radius: 7px;
+  background:
+    linear-gradient(180deg, #1d2830, #101820);
+}
+
+.autopilot-head {
+  min-height: 50px;
+  border-radius: 6px;
+  background:
+    linear-gradient(90deg, #111820 0 18%, #25323b 19% 80%, #111820 81%),
+    #101820;
+}
+
+.ap-buttons b {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
 .fixed-build {
   display: grid;
   gap: 10px;
+}
+
+.planner .cockpit-preview {
+  display: none;
+}
+
+.planner {
+  grid-template-columns: minmax(280px, 420px);
+}
+
+.selected-panel-build {
+  order: -1;
+  margin-top: 8px;
+}
+
+.topbar {
+  order: -2;
 }
 
 .system-configurator,
@@ -722,9 +1056,9 @@ h2 {
 
 .real-panel {
   position: relative;
-  min-height: 330px;
+  min-height: 270px;
   display: grid;
-  grid-template-columns: minmax(430px, 1.55fr) minmax(178px, 0.52fr) minmax(142px, 0.34fr);
+  grid-template-columns: minmax(390px, 1.45fr) minmax(180px, 0.54fr) minmax(132px, 0.32fr);
   gap: 14px;
   padding: 34px 20px 20px;
   border: 1px solid rgba(0, 0, 0, 0.32);
@@ -824,7 +1158,7 @@ h2 {
 .hdx-unit {
   position: relative;
   display: grid;
-  grid-template-rows: 1fr 38px;
+  grid-template-rows: 1fr;
   gap: 8px;
   padding: 14px 12px 12px;
   border: 5px solid #070b0e;
@@ -837,6 +1171,45 @@ h2 {
     inset 0 0 0 1px rgba(255, 255, 255, 0.12),
     0 0 0 2px #05080a,
     0 14px 30px rgba(0, 0, 0, 0.28);
+}
+
+.hdx-unit.has-product-photo {
+  background:
+    var(--product-image) center / contain no-repeat,
+    #eef0ee;
+}
+
+.hdx-unit.has-product-photo .hdx-screen {
+  background: transparent;
+}
+
+.hdx-unit.has-product-photo .hdx-sky,
+.hdx-unit.has-product-photo .hdx-ground,
+.hdx-unit.has-product-photo .hdx-horizon,
+.hdx-unit.has-product-photo .hdx-flight-director,
+.hdx-unit.has-product-photo .hdx-speed,
+.hdx-unit.has-product-photo .hdx-alt,
+.hdx-unit.has-product-photo .hdx-map,
+.hdx-unit.has-product-photo .hdx-status,
+.hdx-unit.has-product-photo .hdx-controls {
+  display: none;
+}
+
+.hdx-unit.has-product-photo .hdx-screen {
+  min-height: 100%;
+}
+
+.hdx-unit.has-product-photo .hdx-screen strong {
+  left: 18px;
+  right: 18px;
+  bottom: 12px;
+  width: fit-content;
+  max-width: calc(100% - 36px);
+  margin: 0 auto;
+  padding: 8px 12px;
+  border-radius: 5px;
+  background: rgba(8, 13, 17, 0.78);
+  text-align: center;
 }
 
 .hdx-screen {
@@ -989,18 +1362,44 @@ h2 {
     0 0 0 2px #070b0e;
 }
 
+.selected-panel-build .stack-column {
+  grid-template-rows: repeat(4, minmax(54px, 1fr));
+}
+
 .stack-face {
   position: relative;
   display: grid;
   align-content: center;
   gap: 3px;
   min-width: 0;
-  padding: 10px 42px 10px 12px;
+  padding: 8px 42px 8px 12px;
   border: 2px solid #070b0e;
   border-radius: 5px;
   background: #101820;
   color: #dffbfb;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.stack-face.has-product-photo {
+  background:
+    linear-gradient(90deg, rgba(9, 14, 18, 0.8) 0 26%, rgba(9, 14, 18, 0.06) 27% 76%, rgba(9, 14, 18, 0.86) 77%),
+    var(--product-image) center / contain no-repeat,
+    #f2f3f1;
+}
+
+.stack-face.has-product-photo span {
+  width: fit-content;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: rgba(8, 13, 17, 0.82);
+}
+
+.stack-face.has-product-photo .radio-display,
+.stack-face.has-product-photo .xpdr-display,
+.stack-face.has-product-photo .ap-display,
+.stack-face.has-product-photo .face-buttons,
+.stack-face.has-product-photo .trio-buttons {
+  opacity: 0;
 }
 
 .stack-face span {
@@ -1022,7 +1421,7 @@ h2 {
   display: grid;
   gap: 2px;
   width: min(100%, 118px);
-  padding: 5px 7px;
+  padding: 4px 7px;
   border-radius: 3px;
   background: #05090c;
   box-shadow: inset 0 0 0 1px rgba(157, 244, 255, 0.18);
@@ -1058,14 +1457,14 @@ h2 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 4px;
-  margin-top: 3px;
+  margin-top: 2px;
   padding-right: 3px;
 }
 
 .face-buttons b,
 .trio-buttons b {
   min-width: 0;
-  padding: 4px 3px;
+  padding: 3px;
   border-radius: 3px;
   background:
     linear-gradient(180deg, #33414b, #1a242d);
@@ -1108,6 +1507,31 @@ h2 {
   box-shadow:
     inset 0 0 0 2px rgba(255, 255, 255, 0.08),
     0 0 0 2px #070b0e;
+}
+
+.g5-unit.has-product-photo {
+  background:
+    var(--product-image) center / contain no-repeat,
+    #f2f3f1;
+}
+
+.g5-unit.has-product-photo .g5-sky,
+.g5-unit.has-product-photo .g5-ground,
+.g5-unit.has-product-photo .g5-horizon,
+.g5-unit.has-product-photo .g5-tape {
+  display: none;
+}
+
+.g5-unit.has-product-photo strong {
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  width: fit-content;
+  max-width: calc(100% - 16px);
+  margin: 0 auto;
+  padding: 4px 7px;
+  border-radius: 4px;
+  background: rgba(8, 13, 17, 0.78);
 }
 
 .g5-sky {

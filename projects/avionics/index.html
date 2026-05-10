@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Small-Airplane Glass Avionics Mixer</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=real-product-preview">
   </head>
   <body>
     <main class="app-shell">
@@ -19,6 +19,7 @@
 
         <section class="planner">
           <div id="previewPanel" class="cockpit-preview" aria-label="Selected panel preview">
+            <div class="panel-placard">Selected panel preview</div>
             <div id="pfdDisplay" class="panel-display pfd-display">
               <div class="sky-band"></div>
               <div class="horizon-line"></div>
@@ -40,7 +41,7 @@
 
             <div id="radioStack" class="radio-stack">
               <div class="stack-unit audio-unit">
-                <span>Audio</span>
+                <span>COM</span>
                 <strong>COM 1 · COM 2</strong>
               </div>
               <div class="stack-unit navigator-unit">
@@ -111,22 +112,22 @@
           </form>
         </section>
 
-        <section class="fixed-build" aria-label="Dynon Trio Val Appareo Garmin fixed panel">
+        <section class="fixed-build selected-panel-build" aria-label="Selected avionics panel preview">
           <div class="section-heading">
             <div>
-              <p class="eyebrow">Requested build</p>
-              <h2>Dynon / Trio Medium-Budget Panel</h2>
+              <p class="eyebrow">Selected build</p>
+              <h2>Panel Preview</h2>
             </div>
-            <span class="count-pill">Fixed mix</span>
+            <span class="count-pill">Dropdown mix</span>
           </div>
 
-          <div class="real-panel">
+          <div id="selectedRealPanel" class="real-panel">
             <div class="panel-label pilot-label">Pilot panel</div>
             <div class="panel-screw screw-one"></div>
             <div class="panel-screw screw-two"></div>
             <div class="panel-screw screw-three"></div>
             <div class="panel-screw screw-four"></div>
-            <div class="hdx-unit">
+            <div id="realPrimaryUnit" class="hdx-unit">
               <div class="unit-screw top-left"></div>
               <div class="unit-screw top-right"></div>
               <div class="unit-screw bottom-left"></div>
@@ -140,7 +141,7 @@
                 <div class="hdx-alt">055<br>045<br>035</div>
                 <div class="hdx-map"></div>
                 <div class="hdx-status">HDG 320&nbsp;&nbsp;ALT 4,500&nbsp;&nbsp;AP READY</div>
-                <strong>Dynon SkyView HDX</strong>
+                <strong id="realPrimaryLabel">Dynon SkyView HDX</strong>
               </div>
               <div class="hdx-controls" aria-hidden="true">
                 <b>NRST</b>
@@ -153,8 +154,20 @@
             </div>
 
             <div class="stack-column">
-              <div class="val-com stack-face">
-                <span>VAL Avionics COM</span>
+              <div id="realNavUnit" class="navigator-face stack-face">
+                <span id="realNavLabel">Retain existing navigator</span>
+                <div class="radio-display">
+                  <strong>GPS</strong>
+                  <small>IFR NAV</small>
+                </div>
+                <div class="face-buttons" aria-hidden="true">
+                  <b>FPL</b>
+                  <b>PROC</b>
+                  <b>DIR</b>
+                </div>
+              </div>
+              <div id="realComUnit" class="val-com stack-face">
+                <span id="realComLabel">Garmin GTR 205</span>
                 <div class="radio-display">
                   <strong>121.500</strong>
                   <small>122.800</small>
@@ -165,8 +178,8 @@
                   <b>FLIP</b>
                 </div>
               </div>
-              <div class="stratus-esg stack-face">
-                <span>Appareo Stratus ESG</span>
+              <div id="realTransponderUnit" class="stratus-esg stack-face">
+                <span id="realTransponderLabel">Appareo Stratus ESG</span>
                 <div class="xpdr-display">
                   <strong>1200</strong>
                   <small>ALT ADS-B OUT</small>
@@ -177,8 +190,8 @@
                   <b>FUNC</b>
                 </div>
               </div>
-              <div class="trio-pro stack-face">
-                <span>Trio Pro Pilot</span>
+              <div id="realAutopilotUnit" class="trio-pro stack-face">
+                <span id="realAutopilotLabel">Trio Pro Pilot</span>
                 <div class="ap-display">
                   <strong>HDG 320</strong>
                   <small>ALT HOLD</small>
@@ -192,7 +205,7 @@
             </div>
 
             <div class="backup-column">
-              <div class="g5-unit">
+              <div id="realBackupUnit" class="g5-unit">
                 <div class="unit-screw top-left"></div>
                 <div class="unit-screw top-right"></div>
                 <div class="unit-screw bottom-left"></div>
@@ -202,7 +215,7 @@
                 <div class="g5-horizon"></div>
                 <div class="g5-tape left-tape">80<br>90<br>100</div>
                 <div class="g5-tape right-tape">4.4<br>4.5<br>4.6</div>
-                <strong>Garmin G5</strong>
+                <strong id="realBackupLabel">Garmin G5</strong>
               </div>
               <div class="breaker-row" aria-hidden="true">
                 <i></i>
@@ -322,6 +335,6 @@
       </section>
     </main>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=real-product-preview"></script>
   </body>
 </html>

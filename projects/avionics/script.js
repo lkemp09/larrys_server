@@ -14,12 +14,28 @@ const previewPfd = document.querySelector("#previewPfd");
 const previewNav = document.querySelector("#previewNav");
 const previewBackup = document.querySelector("#previewBackup");
 const previewAutopilot = document.querySelector("#previewAutopilot");
+const previewCom = document.querySelector(".audio-unit strong");
+const previewXpdr = document.querySelector(".transponder-unit strong");
 const previewPanel = document.querySelector("#previewPanel");
 const pfdDisplay = document.querySelector("#pfdDisplay");
 const mfdDisplay = document.querySelector("#mfdDisplay");
 const radioStack = document.querySelector("#radioStack");
+const comUnit = document.querySelector(".audio-unit");
+const transponderUnit = document.querySelector(".transponder-unit");
 const backupInstrument = document.querySelector("#backupInstrument");
 const autopilotHead = document.querySelector("#autopilotHead");
+const realPrimaryUnit = document.querySelector("#realPrimaryUnit");
+const realPrimaryLabel = document.querySelector("#realPrimaryLabel");
+const realNavUnit = document.querySelector("#realNavUnit");
+const realNavLabel = document.querySelector("#realNavLabel");
+const realComUnit = document.querySelector("#realComUnit");
+const realComLabel = document.querySelector("#realComLabel");
+const realTransponderUnit = document.querySelector("#realTransponderUnit");
+const realTransponderLabel = document.querySelector("#realTransponderLabel");
+const realAutopilotUnit = document.querySelector("#realAutopilotUnit");
+const realAutopilotLabel = document.querySelector("#realAutopilotLabel");
+const realBackupUnit = document.querySelector("#realBackupUnit");
+const realBackupLabel = document.querySelector("#realBackupLabel");
 const systemForm = document.querySelector("#systemForm");
 const priceTableBody = document.querySelector("#priceTableBody");
 const equipmentTotal = document.querySelector("#equipmentTotal");
@@ -364,6 +380,21 @@ const navigatorAveragePrices = [
   },
 ];
 
+const productImages = {
+  "dynon-hdx": "assets/product-images/dynon-hdx.jpg",
+  "garmin-g3x": "assets/product-images/garmin-g3x.jpg",
+  "aspen-e5": "assets/product-images/aspen-e5.png",
+  "garmin-g5": "assets/product-images/garmin-g5.jpg",
+  "garmin-gi275": "assets/product-images/garmin-gi275.jpg",
+  "garmin-gps175": "assets/product-images/garmin-gps175.jpg",
+  "garmin-gnc355": "assets/product-images/garmin-gnc355.png",
+  "garmin-gtr205": "assets/product-images/garmin-gtr205.jpg",
+  "trig-ty96": "assets/product-images/trig-ty96.jpg",
+  "icom-ica220-tso": "assets/product-images/icom-ica220.jpg",
+  "garmin-gfc500": "assets/product-images/garmin-gfc500.jpg",
+  "trio-pro": "assets/product-images/trio-pro-pilot.jpg",
+};
+
 function getSettings() {
   return {
     budget: budgetSelect.value,
@@ -487,63 +518,141 @@ function getProductClass(option) {
     return "product-retained";
   }
 
-  if (option.name.includes("SkyView")) {
+  const name = option.name || option.label || "";
+  const vendor = option.vendor || "";
+
+  if (name.includes("Retain") || name.includes("No ")) {
+    return "product-retained";
+  }
+
+  if (name.includes("SkyView")) {
     return "product-dynon";
   }
 
-  if (option.name.includes("Evolution")) {
+  if (name.includes("Evolution")) {
     return "product-aspen";
   }
 
-  if (option.name.includes("AV-30")) {
+  if (name.includes("AV-30")) {
     return "product-uavionix";
   }
 
-  if (option.name.includes("AeroVue")) {
+  if (name.includes("AeroVue")) {
     return "product-bendixking";
   }
 
-  if (option.name.includes("IFD")) {
+  if (name.includes("IFD")) {
     return "product-avidyne";
   }
 
-  if (option.name.includes("GFC")) {
+  if (name.includes("GFC")) {
     return "product-gfc";
   }
 
-  if (option.vendor === "Trio") {
+  if (vendor === "Trio" || name.includes("Trio")) {
     return "product-trio";
   }
 
-  if (option.vendor === "Garmin") {
+  if (vendor === "Garmin" || name.includes("Garmin")) {
     return "product-garmin";
   }
 
-  return `product-${option.vendor.toLowerCase()}`;
+  if (name.includes("Trig")) {
+    return "product-trig";
+  }
+
+  if (name.includes("Icom")) {
+    return "product-icom";
+  }
+
+  if (name.includes("Appareo")) {
+    return "product-appareo";
+  }
+
+  if (name.includes("Dynon")) {
+    return "product-dynon";
+  }
+
+  return "product-retained";
 }
 
 function setProductClass(element, option) {
-  element.classList.remove(
-    "product-retained",
-    "product-garmin",
-    "product-dynon",
-    "product-aspen",
-    "product-uavionix",
-    "product-bendixking",
-    "product-avidyne",
-    "product-gfc",
-    "product-trio",
-  );
+  Array.from(element.classList)
+    .filter((className) => className.startsWith("product-"))
+    .forEach((className) => element.classList.remove(className));
   element.classList.add(getProductClass(option));
 }
 
 function updatePanelVisuals({ primary, navigator, backup, autopilot }) {
   setProductClass(previewPanel, primary);
   setProductClass(pfdDisplay, primary);
-  setProductClass(mfdDisplay, primary);
+  setProductClass(mfdDisplay, null);
   setProductClass(radioStack, navigator);
   setProductClass(backupInstrument, backup);
   setProductClass(autopilotHead, autopilot);
+}
+
+function setProductImage(element, choice) {
+  const imageUrl = choice ? productImages[choice.id] : "";
+
+  if (imageUrl) {
+    element.style.setProperty("--product-image", `url("${imageUrl}")`);
+    element.classList.add("has-product-photo");
+    return;
+  }
+
+  element.style.removeProperty("--product-image");
+  element.classList.remove("has-product-photo");
+}
+
+function updateConfiguratorPreview() {
+  const primary = getChoice(configCategories.find((category) => category.id === "primary"));
+  const backup = getChoice(configCategories.find((category) => category.id === "backup"));
+  const navigator = getChoice(configCategories.find((category) => category.id === "navigator"));
+  const com = getChoice(configCategories.find((category) => category.id === "com"));
+  const transponder = getChoice(configCategories.find((category) => category.id === "transponder"));
+  const autopilot = getChoice(configCategories.find((category) => category.id === "autopilot"));
+
+  previewPfd.textContent = primary.label;
+  previewNav.textContent = navigator.label;
+  previewBackup.textContent = backup.label;
+  previewCom.textContent = com.label;
+  previewXpdr.textContent = transponder.label;
+  previewAutopilot.textContent = autopilot.label;
+
+  setProductClass(previewPanel, primary);
+  setProductClass(pfdDisplay, primary);
+  setProductClass(mfdDisplay, null);
+  setProductClass(radioStack, navigator);
+  setProductClass(comUnit, com);
+  setProductClass(transponderUnit, transponder);
+  setProductClass(backupInstrument, backup);
+  setProductClass(autopilotHead, autopilot);
+
+  setProductImage(pfdDisplay, primary);
+  setProductImage(backupInstrument, backup);
+  setProductImage(comUnit, com);
+
+  realPrimaryLabel.textContent = primary.label;
+  realNavLabel.textContent = navigator.label;
+  realComLabel.textContent = com.label;
+  realTransponderLabel.textContent = transponder.label;
+  realAutopilotLabel.textContent = autopilot.label;
+  realBackupLabel.textContent = backup.label;
+
+  setProductClass(realPrimaryUnit, primary);
+  setProductClass(realNavUnit, navigator);
+  setProductClass(realComUnit, com);
+  setProductClass(realTransponderUnit, transponder);
+  setProductClass(realAutopilotUnit, autopilot);
+  setProductClass(realBackupUnit, backup);
+
+  setProductImage(realPrimaryUnit, primary);
+  setProductImage(realNavUnit, navigator);
+  setProductImage(realComUnit, com);
+  setProductImage(realTransponderUnit, transponder);
+  setProductImage(realAutopilotUnit, autopilot);
+  setProductImage(realBackupUnit, backup);
 }
 
 function formatRange(range) {
@@ -639,6 +748,7 @@ function updateConfigurator() {
   installTotal.textContent = formatRange(installRange);
   systemTotal.textContent = formatRange(totalRange);
   configTotalPill.textContent = formatRange(totalRange);
+  updateConfiguratorPreview();
 }
 
 function updatePlanner() {
@@ -648,6 +758,7 @@ function updatePlanner() {
 
   renderSolution(solution);
   renderOptions(visibleOptions);
+  updateConfiguratorPreview();
 }
 
 budgetSelect.addEventListener("change", updatePlanner);
