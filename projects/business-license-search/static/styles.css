@@ -52,6 +52,12 @@ code {
   text-align: center;
 }
 
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
 .filters {
   align-items: end;
   background: white;
@@ -125,9 +131,16 @@ button.secondary {
   justify-content: space-between;
 }
 
-h2 {
-  font-size: 18px;
+.license-main h2 {
+  font-size: 23.4px;
+  line-height: 1.15;
   margin: 0;
+}
+
+.license-tools {
+  align-items: center;
+  display: flex;
+  gap: 8px;
 }
 
 .badge {
@@ -169,6 +182,96 @@ dd {
   padding: 14px;
 }
 
+.drawer-backdrop {
+  background: rgba(18, 28, 24, 0.34);
+  inset: 0;
+  position: fixed;
+  z-index: 10;
+}
+
+.drawer {
+  background: white;
+  border-left: 1px solid #cbd5d0;
+  box-shadow: -18px 0 38px rgba(23, 33, 29, 0.18);
+  height: 100vh;
+  max-width: min(620px, 100vw);
+  overflow-y: auto;
+  padding: 22px;
+  position: fixed;
+  right: 0;
+  top: 0;
+  transform: translateX(100%);
+  transition: transform 160ms ease;
+  width: 620px;
+  z-index: 20;
+}
+
+.drawer.open {
+  transform: translateX(0);
+}
+
+.drawer-header {
+  align-items: start;
+  border-bottom: 1px solid #d8dfdc;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+}
+
+.drawer-header h2 {
+  font-size: 24px;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.icon-button {
+  align-items: center;
+  background: #eef2f0;
+  border-color: #b9c4bf;
+  color: #173f35;
+  display: inline-flex;
+  font-size: 20px;
+  height: 36px;
+  justify-content: center;
+  min-height: 36px;
+  min-width: 36px;
+  padding: 0;
+  width: 36px;
+}
+
+.license-form {
+  display: grid;
+  gap: 14px;
+}
+
+.form-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.form-grid label:first-child,
+.form-grid label:nth-child(4),
+.form-grid label:nth-child(9),
+.form-grid label:nth-child(16) {
+  grid-column: 1 / -1;
+}
+
+.form-message {
+  color: #8d3f12;
+  font-weight: 700;
+  min-height: 20px;
+}
+
+.drawer-actions {
+  border-top: 1px solid #d8dfdc;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding-top: 14px;
+}
+
 @media (max-width: 900px) {
   main {
     padding: 18px;
@@ -181,12 +284,26 @@ dd {
   }
 
   .filters,
+  .form-grid,
   dl,
   .actions {
     grid-template-columns: 1fr;
   }
 
+  .form-grid label:first-child,
+  .form-grid label:nth-child(4),
+  .form-grid label:nth-child(9),
+  .form-grid label:nth-child(16) {
+    grid-column: auto;
+  }
+
   .actions {
     display: grid;
+  }
+
+  .license-tools,
+  .drawer-actions {
+    align-items: stretch;
+    flex-direction: column;
   }
 }

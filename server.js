@@ -275,6 +275,36 @@ function sendText(response, statusCode, text) {
   response.end(body);
 }
 
+function readJsonBody(request) {
+  return new Promise((resolve, reject) => {
+    let body = "";
+
+    request.on("data", (chunk) => {
+      body += chunk;
+
+      if (body.length > 1_000_000) {
+        reject(new Error("Request body is too large."));
+        request.destroy();
+      }
+    });
+
+    request.on("end", () => {
+      if (!body.trim()) {
+        resolve({});
+        return;
+      }
+
+      try {
+        resolve(JSON.parse(body));
+      } catch {
+        reject(new Error("Request body must be valid JSON."));
+      }
+    });
+
+    request.on("error", reject);
+  });
+}
+
 function sendFile(response, filePath) {
   fs.readFile(filePath, (error, contents) => {
     if (error) {
@@ -320,6 +350,150 @@ function getBusinessPool() {
 function addFilter(filters, values, sql, value) {
   values.push(value);
   filters.push(sql.replace("?", `$${values.length}`));
+}
+
+function parseOptionalInteger(value) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed)) {
+    throw new Error("License number must be a whole number.");
+  }
+
+  return parsed;
+}
+
+function parseOptionalDate(value, label) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value))) {
+    throw new Error(`${label} must use YYYY-MM-DD format.`);
+  }
+
+  return value;
+}
+
+function cleanText(value) {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  const cleaned = String(value).trim();
+  return cleaned || null;
+}
+
+function normalizeLicenseInput(input) {
+  const row = {
+    owners: cleanText(input.owners),
+    license_number: parseOptionalInteger(input.licenseNumber),
+    business_name: cleanText(input.businessName),
+    status: cleanText(input.status),
+    issue_date: parseOptionalDate(input.issueDate, "Issue date"),
+    renew_date: parseOptionalDate(input.renewDate, "Renew date"),
+    expire_date: parseOptionalDate(input.expireDate, "Expire date"),
+    has_telemedicine: cleanText(input.hasTelemedicine),
+    physical_city: cleanText(input.physicalCity),
+    physical_country: cleanText(input.physicalCountry),
+    physical_line1: cleanText(input.physicalLine1),
+    physical_line2: cleanText(input.physicalLine2),
+    physical_state: cleanText(input.physicalState),
+    physical_zip: cleanText(input.physicalZip),
+    physical_zip_plus: cleanText(input.physicalZipPlus),
+    mailing_city: cleanText(input.mailingCity),
+    mailing_country: cleanText(input.mailingCountry),
+    mailing_line1: cleanText(input.mailingLine1),
+    mailing_line2: cleanText(input.mailingLine2),
+    mailing_state: cleanText(input.mailingState),
+    mailing_zip: cleanText(input.mailingZip),
+    mailing_zip_plus: cleanText(input.mailingZipPlus),
+  };
+
+  if (!row.business_name) {
+    throw new Error("Business name is required.");
+  }
+
+  return row;
+}
+
+function licenseSelectSql() {
+  return `
+    SELECT
+      id,
+      owners,
+      license_number AS "licenseNumber",
+      business_name AS "businessName",
+      status,
+      to_char(issue_date, 'YYYY-MM-DD') AS "issueDate",
+      to_char(renew_date, 'YYYY-MM-DD') AS "renewDate",
+      to_char(expire_date, 'YYYY-MM-DD') AS "expireDate",
+      has_telemedicine AS "hasTelemedicine",
+      physical_city AS "physicalCity",
+      physical_country AS "physicalCountry",
+      physical_line1 AS "physicalLine1",
+      physical_line2 AS "physicalLine2",
+      physical_state AS "physicalState",
+      physical_zip AS "physicalZip",
+      physical_zip_plus AS "physicalZipPlus",
+      mailing_city AS "mailingCity",
+      mailing_country AS "mailingCountry",
+      mailing_line1 AS "mailingLine1",
+      mailing_line2 AS "mailingLine2",
+      mailing_state AS "mailingState",
+      mailing_zip AS "mailingZip",
+      mailing_zip_plus AS "mailingZipPlus"
+    FROM bus_lic.business_licenses
+  `;
+}
+
+async function createBusinessLicense(response, request) {
+  const input = normalizeLicenseInput(await readJsonBody(request));
+  const columns = Object.keys(input);
+  const values = Object.values(input);
+  const placeholders = values.map((_, index) => `$${index + 1}`);
+  const pool = getBusinessPool();
+
+  const result = await pool.query(`
+    INSERT INTO bus_lic.business_licenses (${columns.join(", ")})
+    VALUES (${placeholders.join(", ")})
+    RETURNING id
+  `, values);
+
+  const rowResult = await pool.query(`${licenseSelectSql()} WHERE id = $1`, [result.rows[0].id]);
+  sendJson(response, 201, rowResult.rows[0]);
+}
+
+async function updateBusinessLicense(response, request, id) {
+  const parsedId = Number(id);
+  if (!Number.isInteger(parsedId) || parsedId < 1) {
+    sendJson(response, 400, { error: "License id is invalid." });
+    return;
+  }
+
+  const input = normalizeLicenseInput(await readJsonBody(request));
+  const columns = Object.keys(input);
+  const values = Object.values(input);
+  const assignments = columns.map((column, index) => `${column} = $${index + 1}`);
+  values.push(parsedId);
+  const pool = getBusinessPool();
+
+  const result = await pool.query(`
+    UPDATE bus_lic.business_licenses
+    SET ${assignments.join(", ")}
+    WHERE id = $${values.length}
+    RETURNING id
+  `, values);
+
+  if (!result.rows.length) {
+    sendJson(response, 404, { error: "License not found." });
+    return;
+  }
+
+  const rowResult = await pool.query(`${licenseSelectSql()} WHERE id = $1`, [parsedId]);
+  sendJson(response, 200, rowResult.rows[0]);
 }
 
 async function handleBusinessApi(response, searchParams) {
@@ -373,31 +547,7 @@ async function handleBusinessApi(response, searchParams) {
   const queryValues = [...values, limit];
   const limitPlaceholder = `$${queryValues.length}`;
   const rowsResult = await pool.query(`
-    SELECT
-      id,
-      owners,
-      license_number AS "licenseNumber",
-      business_name AS "businessName",
-      status,
-      to_char(issue_date, 'YYYY-MM-DD') AS "issueDate",
-      to_char(renew_date, 'YYYY-MM-DD') AS "renewDate",
-      to_char(expire_date, 'YYYY-MM-DD') AS "expireDate",
-      has_telemedicine AS "hasTelemedicine",
-      physical_city AS "physicalCity",
-      physical_country AS "physicalCountry",
-      physical_line1 AS "physicalLine1",
-      physical_line2 AS "physicalLine2",
-      physical_state AS "physicalState",
-      physical_zip AS "physicalZip",
-      physical_zip_plus AS "physicalZipPlus",
-      mailing_city AS "mailingCity",
-      mailing_country AS "mailingCountry",
-      mailing_line1 AS "mailingLine1",
-      mailing_line2 AS "mailingLine2",
-      mailing_state AS "mailingState",
-      mailing_zip AS "mailingZip",
-      mailing_zip_plus AS "mailingZipPlus"
-    FROM bus_lic.business_licenses
+    ${licenseSelectSql()}
     ${whereSql}
     ORDER BY business_name, license_number
     LIMIT ${limitPlaceholder}
@@ -411,7 +561,7 @@ async function handleBusinessApi(response, searchParams) {
   });
 }
 
-function handleProject(requestUrl, response) {
+function handleProject(request, requestUrl, response) {
   const parts = requestUrl.pathname.split("/").filter(Boolean);
   const slug = parts[1];
   const project = projectBySlug.get(slug);
@@ -422,9 +572,33 @@ function handleProject(requestUrl, response) {
   }
 
   if (slug === "business-license-search" && parts[2] === "api" && parts[3] === "licenses") {
-    handleBusinessApi(response, requestUrl.searchParams).catch((error) => {
-      sendJson(response, 500, { error: error.message });
-    });
+    if (request.method === "GET" && !parts[4]) {
+      handleBusinessApi(response, requestUrl.searchParams).catch((error) => {
+        sendJson(response, 500, { error: error.message });
+      });
+      return;
+    }
+
+    if (request.method === "POST" && !parts[4]) {
+      createBusinessLicense(response, request).catch((error) => {
+        sendJson(response, 400, { error: error.message });
+      });
+      return;
+    }
+
+    if (request.method === "PUT" && parts[4]) {
+      updateBusinessLicense(response, request, parts[4]).catch((error) => {
+        sendJson(response, 400, { error: error.message });
+      });
+      return;
+    }
+
+    sendText(response, 405, "Method not allowed");
+    return;
+  }
+
+  if (request.method !== "GET") {
+    sendText(response, 405, "Method not allowed");
     return;
   }
 
@@ -463,7 +637,12 @@ function handleProject(requestUrl, response) {
 const server = http.createServer((request, response) => {
   const requestUrl = new URL(request.url || "/", `http://${request.headers.host || "localhost"}`);
 
-  if (request.method !== "GET") {
+  if (!["GET", "POST", "PUT"].includes(request.method)) {
+    sendText(response, 405, "Method not allowed");
+    return;
+  }
+
+  if (request.method !== "GET" && !requestUrl.pathname.startsWith("/projects/business-license-search/api/")) {
     sendText(response, 405, "Method not allowed");
     return;
   }
@@ -480,7 +659,7 @@ const server = http.createServer((request, response) => {
   }
 
   if (requestUrl.pathname.startsWith("/projects/")) {
-    handleProject(requestUrl, response);
+    handleProject(request, requestUrl, response);
     return;
   }
 

@@ -15,6 +15,9 @@
       </div>
       <div class="stat" id="count">Ready</div>
     </header>
+    <div class="toolbar">
+      <button type="button" id="openAddDrawer">Add License</button>
+    </div>
     <form id="filters" class="filters">
       <label>Search
         <input name="search" placeholder="Business, owner, license, address">
@@ -48,6 +51,108 @@
     </form>
     <section id="results" class="results"></section>
   </main>
+  <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+  <aside class="drawer" id="addDrawer" aria-labelledby="addDrawerTitle" aria-hidden="true">
+    <form id="addLicenseForm" class="license-form">
+      <header class="drawer-header">
+        <div>
+          <h2 id="addDrawerTitle">Add License</h2>
+        </div>
+        <button type="button" class="icon-button" data-close-drawer aria-label="Close add drawer">x</button>
+      </header>
+      <div class="form-grid">
+        <label>Business Name<input name="businessName" required></label>
+        <label>License Number<input name="licenseNumber" inputmode="numeric"></label>
+        <label>Status
+          <select name="status">
+            <option>Active</option>
+            <option>Expired</option>
+            <option>Cancelled</option>
+          </select>
+        </label>
+        <label>Owner<input name="owners"></label>
+        <label>Issue Date<input name="issueDate" type="date"></label>
+        <label>Renew Date<input name="renewDate" type="date"></label>
+        <label>Expire Date<input name="expireDate" type="date"></label>
+        <label>Telemedicine
+          <select name="hasTelemedicine">
+            <option>No</option>
+            <option>Yes</option>
+          </select>
+        </label>
+        <label>Physical Line 1<input name="physicalLine1"></label>
+        <label>Physical Line 2<input name="physicalLine2"></label>
+        <label>Physical City<input name="physicalCity"></label>
+        <label>Physical State<input name="physicalState" maxlength="2"></label>
+        <label>Physical Zip<input name="physicalZip"></label>
+        <label>Physical Zip Plus<input name="physicalZipPlus"></label>
+        <label>Physical Country<input name="physicalCountry" value="UNITED STATES"></label>
+        <label>Mailing Line 1<input name="mailingLine1"></label>
+        <label>Mailing Line 2<input name="mailingLine2"></label>
+        <label>Mailing City<input name="mailingCity"></label>
+        <label>Mailing State<input name="mailingState" maxlength="2"></label>
+        <label>Mailing Zip<input name="mailingZip"></label>
+        <label>Mailing Zip Plus<input name="mailingZipPlus"></label>
+        <label>Mailing Country<input name="mailingCountry" value="UNITED STATES"></label>
+      </div>
+      <p class="form-message" id="addFormMessage" role="status"></p>
+      <footer class="drawer-actions">
+        <button type="submit">Save License</button>
+        <button type="button" class="secondary" data-close-drawer>Cancel</button>
+      </footer>
+    </form>
+  </aside>
+  <aside class="drawer" id="editDrawer" aria-labelledby="editDrawerTitle" aria-hidden="true">
+    <form id="editLicenseForm" class="license-form">
+      <input type="hidden" name="id">
+      <header class="drawer-header">
+        <div>
+          <h2 id="editDrawerTitle">Edit License</h2>
+        </div>
+        <button type="button" class="icon-button" data-close-drawer aria-label="Close edit drawer">x</button>
+      </header>
+      <div class="form-grid">
+        <label>Business Name<input name="businessName" required></label>
+        <label>License Number<input name="licenseNumber" inputmode="numeric"></label>
+        <label>Status
+          <select name="status">
+            <option>Active</option>
+            <option>Expired</option>
+            <option>Cancelled</option>
+          </select>
+        </label>
+        <label>Owner<input name="owners"></label>
+        <label>Issue Date<input name="issueDate" type="date"></label>
+        <label>Renew Date<input name="renewDate" type="date"></label>
+        <label>Expire Date<input name="expireDate" type="date"></label>
+        <label>Telemedicine
+          <select name="hasTelemedicine">
+            <option>No</option>
+            <option>Yes</option>
+          </select>
+        </label>
+        <label>Physical Line 1<input name="physicalLine1"></label>
+        <label>Physical Line 2<input name="physicalLine2"></label>
+        <label>Physical City<input name="physicalCity"></label>
+        <label>Physical State<input name="physicalState" maxlength="2"></label>
+        <label>Physical Zip<input name="physicalZip"></label>
+        <label>Physical Zip Plus<input name="physicalZipPlus"></label>
+        <label>Physical Country<input name="physicalCountry"></label>
+        <label>Mailing Line 1<input name="mailingLine1"></label>
+        <label>Mailing Line 2<input name="mailingLine2"></label>
+        <label>Mailing City<input name="mailingCity"></label>
+        <label>Mailing State<input name="mailingState" maxlength="2"></label>
+        <label>Mailing Zip<input name="mailingZip"></label>
+        <label>Mailing Zip Plus<input name="mailingZipPlus"></label>
+        <label>Mailing Country<input name="mailingCountry"></label>
+      </div>
+      <p class="form-message" id="editFormMessage" role="status"></p>
+      <footer class="drawer-actions">
+        <button type="submit">Update License</button>
+        <button type="button" class="secondary" data-close-drawer>Cancel</button>
+      </footer>
+    </form>
+  </aside>
   <script>
     window.BUSINESS_LICENSE_API_BASE = "/projects/business-license-search";
   </script>
