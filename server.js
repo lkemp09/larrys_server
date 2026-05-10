@@ -1,15 +1,12 @@
 const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
-const { spawn } = require("node:child_process");
+const { Pool } = require("pg");
 
 const port = Number(process.env.PORT) || 3000;
 const rootDir = __dirname;
 const projectsDir = path.join(rootDir, "projects");
-const businessProjectDir = path.join(projectsDir, "business-license-search");
-const businessQueryScript = path.join(businessProjectDir, "scripts", "Query-BusinessLicenses.ps1");
-const businessDatabasePath = path.join(rootDir, "data", "business-licenses", "BusinessLicenses.accdb");
-const powershellX86 = "C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe";
+let businessPool;
 
 const projects = [
   {
@@ -305,54 +302,112 @@ function resolveProjectPath(projectRoot, routeParts) {
   return normalizedPath;
 }
 
-function handleBusinessApi(response, searchParams) {
-  const args = [
-    "-NoProfile",
-    "-ExecutionPolicy",
-    "Bypass",
-    "-File",
-    businessQueryScript,
-    "-DatabasePath",
-    businessDatabasePath,
-    "-Search",
-    searchParams.get("search") || "",
-    "-Status",
-    searchParams.get("status") || "",
-    "-City",
-    searchParams.get("city") || "",
-    "-State",
-    searchParams.get("state") || "",
-    "-Limit",
-    searchParams.get("limit") || "50",
-  ];
+function getBusinessPool() {
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is not configured.");
+  }
 
-  const child = spawn(powershellX86, args, { windowsHide: true });
-  let stdout = "";
-  let stderr = "";
+  if (!businessPool) {
+    businessPool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: process.env.PGSSLMODE === "require" ? { rejectUnauthorized: false } : undefined,
+    });
+  }
 
-  child.stdout.on("data", (chunk) => {
-    stdout += chunk;
-  });
+  return businessPool;
+}
 
-  child.stderr.on("data", (chunk) => {
-    stderr += chunk;
-  });
+function addFilter(filters, values, sql, value) {
+  values.push(value);
+  filters.push(sql.replace("?", `$${values.length}`));
+}
 
-  child.on("error", (error) => {
-    sendJson(response, 500, { error: error.message });
-  });
+async function handleBusinessApi(response, searchParams) {
+  let limit = Number(searchParams.get("limit") || "50");
+  if (!Number.isFinite(limit)) {
+    limit = 50;
+  }
+  if (limit < 1) { limit = 1; }
+  if (limit > 250) { limit = 250; }
 
-  child.on("close", (code) => {
-    if (code !== 0) {
-      sendJson(response, 500, { error: stderr.trim() || stdout.trim() || `Query failed with exit code ${code}.` });
-      return;
-    }
+  const filters = [];
+  const values = [];
+  const search = (searchParams.get("search") || "").trim();
+  const status = (searchParams.get("status") || "").trim();
+  const city = (searchParams.get("city") || "").trim();
+  const state = (searchParams.get("state") || "").trim();
 
-    try {
-      sendJson(response, 200, JSON.parse(stdout));
-    } catch (error) {
-      sendJson(response, 500, { error: `Could not parse query output: ${error.message}` });
-    }
+  if (search) {
+    const pattern = `%${search}%`;
+    values.push(pattern);
+    const placeholder = `$${values.length}`;
+    filters.push(`(
+      business_name ILIKE ${placeholder}
+      OR owners ILIKE ${placeholder}
+      OR license_number::text ILIKE ${placeholder}
+      OR physical_line1 ILIKE ${placeholder}
+      OR mailing_line1 ILIKE ${placeholder}
+    )`);
+  }
+
+  if (status) {
+    addFilter(filters, values, "status = ?", status);
+  }
+
+  if (city) {
+    addFilter(filters, values, "physical_city ILIKE ?", `%${city}%`);
+  }
+
+  if (state) {
+    addFilter(filters, values, "upper(physical_state) = upper(?)", state);
+  }
+
+  const whereSql = filters.length ? `WHERE ${filters.join(" AND ")}` : "";
+  const pool = getBusinessPool();
+
+  const countResult = await pool.query(
+    `SELECT COUNT(*)::int AS total FROM bus_lic.business_licenses ${whereSql}`,
+    values,
+  );
+
+  const queryValues = [...values, limit];
+  const limitPlaceholder = `$${queryValues.length}`;
+  const rowsResult = await pool.query(`
+    SELECT
+      id,
+      owners,
+      license_number AS "licenseNumber",
+      business_name AS "businessName",
+      status,
+      to_char(issue_date, 'YYYY-MM-DD') AS "issueDate",
+      to_char(renew_date, 'YYYY-MM-DD') AS "renewDate",
+      to_char(expire_date, 'YYYY-MM-DD') AS "expireDate",
+      has_telemedicine AS "hasTelemedicine",
+      physical_city AS "physicalCity",
+      physical_country AS "physicalCountry",
+      physical_line1 AS "physicalLine1",
+      physical_line2 AS "physicalLine2",
+      physical_state AS "physicalState",
+      physical_zip AS "physicalZip",
+      physical_zip_plus AS "physicalZipPlus",
+      mailing_city AS "mailingCity",
+      mailing_country AS "mailingCountry",
+      mailing_line1 AS "mailingLine1",
+      mailing_line2 AS "mailingLine2",
+      mailing_state AS "mailingState",
+      mailing_zip AS "mailingZip",
+      mailing_zip_plus AS "mailingZipPlus"
+    FROM bus_lic.business_licenses
+    ${whereSql}
+    ORDER BY business_name, license_number
+    LIMIT ${limitPlaceholder}
+  `, queryValues);
+
+  sendJson(response, 200, {
+    total: countResult.rows[0].total,
+    returned: rowsResult.rows.length,
+    limit,
+    rows: rowsResult.rows,
   });
 }
 
@@ -367,7 +422,9 @@ function handleProject(requestUrl, response) {
   }
 
   if (slug === "business-license-search" && parts[2] === "api" && parts[3] === "licenses") {
-    handleBusinessApi(response, requestUrl.searchParams);
+    handleBusinessApi(response, requestUrl.searchParams).catch((error) => {
+      sendJson(response, 500, { error: error.message });
+    });
     return;
   }
 

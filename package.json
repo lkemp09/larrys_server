@@ -2,7 +2,11 @@
   "name": "larrys-server",
   "version": "1.0.0",
   "private": true,
+  "dependencies": {
+    "pg": "^8.13.1"
+  },
   "scripts": {
+    "import:business-licenses": "node scripts/import-business-licenses-postgres.js",
     "start": "node server.js"
   }
 }
