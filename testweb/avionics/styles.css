@@ -630,7 +630,8 @@ h2 {
   gap: 10px;
 }
 
-.system-configurator {
+.system-configurator,
+.navigator-prices {
   display: grid;
   gap: 10px;
 }
@@ -642,7 +643,8 @@ h2 {
 }
 
 .config-form,
-.price-panel {
+.price-panel,
+.navigator-prices {
   display: grid;
   gap: 10px;
   padding: 14px;
@@ -711,6 +713,11 @@ h2 {
   color: var(--good);
   font-weight: 800;
   white-space: nowrap;
+}
+
+.navigator-price-table td:nth-child(2) {
+  color: var(--muted);
+  font-weight: 700;
 }
 
 .real-panel {

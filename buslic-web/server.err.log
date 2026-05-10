@@ -1,0 +1,24 @@
+127.0.0.1 - - [08/May/2026 21:15:07] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [08/May/2026 21:15:11] "GET /api/licenses?search=roofing&limit=1 HTTP/1.1" 200 -
+127.0.0.1 - - [08/May/2026 21:15:19] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [08/May/2026 21:15:20] "GET /static/app.js HTTP/1.1" 200 -
+127.0.0.1 - - [08/May/2026 21:15:20] "GET /static/styles.css HTTP/1.1" 200 -
+127.0.0.1 - - [08/May/2026 21:15:20] code 404, message File not found
+127.0.0.1 - - [08/May/2026 21:15:20] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [08/May/2026 21:15:22] "GET /api/licenses?search=jones&status=&city=fairbanks&state=&limit=50 HTTP/1.1" 200 -
+127.0.0.1 - - [08/May/2026 21:15:26] "GET /api/licenses?search=&status=&city=&state=&limit=50 HTTP/1.1" 200 -
+127.0.0.1 - - [08/May/2026 21:15:49] "GET /api/licenses?search=kemp&status=Expired&city=juneau&state=&limit=50 HTTP/1.1" 200 -
+127.0.0.1 - - [08/May/2026 21:16:00] "GET /api/licenses?search=kemp&status=&city=juneau&state=&limit=50 HTTP/1.1" 200 -
+127.0.0.1 - - [08/May/2026 21:16:15] "GET /api/licenses?search=&status=&city=&state=&limit=50 HTTP/1.1" 200 -
+127.0.0.1 - - [08/May/2026 21:16:47] "GET /api/licenses?search=hardrock+&status=&city=KETCHIKAN&state=AK&limit=50 HTTP/1.1" 200 -
+127.0.0.1 - - [08/May/2026 21:20:32] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [08/May/2026 21:20:32] "GET /static/styles.css HTTP/1.1" 200 -
+127.0.0.1 - - [08/May/2026 21:20:32] "GET /static/app.js HTTP/1.1" 200 -
+127.0.0.1 - - [08/May/2026 21:20:35] "GET /api/licenses?search=&status=&city=&state=&limit=50 HTTP/1.1" 200 -
+127.0.0.1 - - [08/May/2026 21:22:28] "GET /api/licenses?search=&status=&city=hoonah&state=&limit=50 HTTP/1.1" 200 -
+127.0.0.1 - - [08/May/2026 22:47:16] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [08/May/2026 22:47:19] "GET /api/licenses?limit=1 HTTP/1.1" 200 -
+127.0.0.1 - - [08/May/2026 22:47:29] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [08/May/2026 22:47:29] "GET /static/styles.css HTTP/1.1" 200 -
+127.0.0.1 - - [08/May/2026 22:47:29] "GET /static/app.js HTTP/1.1" 200 -
+127.0.0.1 - - [08/May/2026 22:47:33] "GET /api/licenses?search=&status=&city=&state=&limit=50 HTTP/1.1" 200 -

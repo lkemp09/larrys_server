@@ -26,6 +26,7 @@ const equipmentTotal = document.querySelector("#equipmentTotal");
 const installTotal = document.querySelector("#installTotal");
 const systemTotal = document.querySelector("#systemTotal");
 const configTotalPill = document.querySelector("#configTotalPill");
+const navigatorPriceBody = document.querySelector("#navigatorPriceBody");
 
 const currency = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
@@ -324,6 +325,45 @@ const configCategories = [
   },
 ];
 
+const navigatorAveragePrices = [
+  {
+    name: "Garmin GPS 175",
+    type: "IFR WAAS GPS",
+    equipment: [5500, 7500],
+    install: [5000, 10000],
+  },
+  {
+    name: "Garmin GNC 355",
+    type: "IFR WAAS GPS / COM",
+    equipment: [8000, 10500],
+    install: [6000, 12000],
+  },
+  {
+    name: "Garmin GNX 375",
+    type: "IFR WAAS GPS / ADS-B transponder",
+    equipment: [8500, 10500],
+    install: [6500, 12500],
+  },
+  {
+    name: "Garmin GTN 650Xi",
+    type: "IFR GPS / NAV / COM / MFD",
+    equipment: [14000, 18000],
+    install: [8000, 16000],
+  },
+  {
+    name: "Avidyne IFD 440",
+    type: "IFR FMS / GPS / NAV / COM",
+    equipment: [13000, 17000],
+    install: [7000, 15000],
+  },
+  {
+    name: "BendixKing AeroNav 800",
+    type: "IFR GPS / NAV / COM",
+    equipment: [12000, 17000],
+    install: [7000, 15000],
+  },
+];
+
 function getSettings() {
   return {
     budget: budgetSelect.value,
@@ -516,8 +556,32 @@ function formatRange(range) {
   return `${currency.format(low)}-${currency.format(high)}`;
 }
 
+function getAverage(range) {
+  return Math.round((range[0] + range[1]) / 2);
+}
+
+function formatAverage(range) {
+  return currency.format(getAverage(range));
+}
+
 function addRanges(first, second) {
   return [first[0] + second[0], first[1] + second[1]];
+}
+
+function renderNavigatorAveragePrices() {
+  navigatorPriceBody.innerHTML = navigatorAveragePrices.map((navigator) => {
+    const installedAverage = getAverage(navigator.equipment) + getAverage(navigator.install);
+
+    return `
+      <tr>
+        <td>${navigator.name}</td>
+        <td>${navigator.type}</td>
+        <td>${formatAverage(navigator.equipment)}</td>
+        <td>${formatAverage(navigator.install)}</td>
+        <td>${currency.format(installedAverage)}</td>
+      </tr>
+    `;
+  }).join("");
 }
 
 function getChoice(category) {
@@ -592,5 +656,6 @@ autopilotToggle.addEventListener("change", updatePlanner);
 certifiedToggle.addEventListener("change", updatePlanner);
 
 renderConfigurator();
+renderNavigatorAveragePrices();
 updateConfigurator();
 updatePlanner();

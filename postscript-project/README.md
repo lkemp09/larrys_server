@@ -10,6 +10,12 @@ powershell -ExecutionPolicy Bypass -File .\scripts\render.ps1
 
 This writes `build\hello.pdf`.
 
+To render another file from `src`, pass its base name:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\render.ps1 hello-larry-spokes
+```
+
 ## Project Layout
 
 - `src\hello.ps` - sample PostScript document

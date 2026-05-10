@@ -1,0 +1,194 @@
+%!PS-Adobe-3.0
+%%Title: 1968 Cessna 180 Fuel Selector Control Study
+%%Creator: postscript-project
+%%Pages: 1
+%%BoundingBox: 0 0 612 792
+%%EndComments
+
+/inch { 72 mul } bind def
+/cx 300 def
+/cy 300 def
+/plateDiameter 3.25 inch def
+/plateRadius plateDiameter 2 div def
+/hubRadius 0.34 inch def
+/knobLength 1.24 inch def
+/knobWidth 0.30 inch def
+
+/titleFont /Helvetica-Bold findfont 16 scalefont def
+/labelFont /Helvetica-Bold findfont 11 scalefont def
+/smallFont /Helvetica findfont 8 scalefont def
+/dimFont /Helvetica findfont 7 scalefont def
+
+/ctshow {
+  dup stringwidth pop 2 div neg 0 rmoveto show
+} bind def
+
+/rotlabel {
+  /text exch def
+  /y exch def
+  /x exch def
+  /angle exch def
+  gsave
+    cx cy translate
+    angle rotate
+    x y moveto
+    text ctshow
+  grestore
+} bind def
+
+/tick {
+  /angle exch def
+  gsave
+    cx cy translate
+    angle rotate
+    newpath
+    0 plateRadius 0.88 mul moveto
+    0 plateRadius 0.99 mul lineto
+    stroke
+  grestore
+} bind def
+
+/dimArrow {
+  /y2 exch def /x2 exch def /y1 exch def /x1 exch def
+  newpath x1 y1 moveto x2 y2 lineto stroke
+  /ang y2 y1 sub x2 x1 sub atan def
+  gsave
+    x1 y1 translate ang rotate
+    newpath 0 0 moveto 6 2.4 lineto 6 -2.4 lineto closepath fill
+  grestore
+  gsave
+    x2 y2 translate ang 180 add rotate
+    newpath 0 0 moveto 6 2.4 lineto 6 -2.4 lineto closepath fill
+  grestore
+} bind def
+
+%%Page: 1 1
+gsave
+
+% White sheet.
+1 1 1 setrgbcolor
+newpath
+0 0 moveto 612 0 lineto 612 792 lineto 0 792 lineto closepath fill
+
+% Title.
+0.08 0.10 0.11 setrgbcolor
+titleFont setfont
+300 720 moveto (1968 Cessna 180 Fuel Selector Control - Study Drawing) ctshow
+smallFont setfont
+300 706 moveto (Approximate visual/sizing reference only. Not an airworthy placard or installation drawing.) ctshow
+
+% Outer plate.
+gsave
+  cx cy translate
+  0.08 0.09 0.09 setrgbcolor
+  newpath 0 0 plateRadius 0 360 arc closepath fill
+
+  0.78 0.80 0.78 setrgbcolor
+  1.5 setlinewidth
+  newpath 0 0 plateRadius 0 360 arc closepath stroke
+  newpath 0 0 plateRadius 0.82 mul 0 360 arc closepath stroke
+
+  % Selector arcs.
+  0.96 0.96 0.90 setrgbcolor
+  2.5 setlinewidth
+  newpath 0 0 plateRadius 0.68 mul 35 145 arc stroke
+  newpath 0 0 plateRadius 0.68 mul 215 325 arc stroke
+grestore
+
+% Position ticks.
+0.96 0.96 0.90 setrgbcolor
+1.6 setlinewidth
+0 tick
+60 tick
+120 tick
+240 tick
+300 tick
+180 tick
+
+% Labels around the plate.
+labelFont setfont
+0.96 0.96 0.90 setrgbcolor
+0 0 plateRadius 0.58 mul (BOTH ON) rotlabel
+60 0 plateRadius 0.60 mul (RIGHT) rotlabel
+60 0 plateRadius 0.48 mul (TANK) rotlabel
+120 0 plateRadius 0.60 mul (LEFT) rotlabel
+120 0 plateRadius 0.48 mul (TANK) rotlabel
+240 0 plateRadius 0.58 mul (OFF) rotlabel
+300 0 plateRadius 0.58 mul (OFF) rotlabel
+
+smallFont setfont
+0 0 plateRadius -0.72 mul (60 GAL) rotlabel
+0 0 plateRadius -0.84 mul (CESSNA 180) rotlabel
+
+% Center selector knob, shown aimed at BOTH.
+gsave
+  cx cy translate
+  0 rotate
+  0.80 0.82 0.78 setrgbcolor
+  newpath
+  knobWidth -2 div hubRadius neg moveto
+  knobWidth 2 div hubRadius neg lineto
+  knobWidth 2 div knobLength lineto
+  knobWidth -2 div knobLength lineto
+  closepath
+  fill
+
+  0.18 0.19 0.18 setrgbcolor
+  1 setlinewidth
+  newpath
+  knobWidth -2 div hubRadius neg moveto
+  knobWidth 2 div hubRadius neg lineto
+  knobWidth 2 div knobLength lineto
+  knobWidth -2 div knobLength lineto
+  closepath
+  stroke
+
+  0.88 0.10 0.08 setrgbcolor
+  newpath 0 knobLength 0.13 inch 0 360 arc closepath fill
+
+  0.63 0.64 0.60 setrgbcolor
+  newpath 0 0 hubRadius 0 360 arc closepath fill
+  0.12 0.13 0.12 setrgbcolor
+  newpath 0 0 hubRadius 0 360 arc closepath stroke
+grestore
+
+% Center reference point.
+0.90 0.08 0.05 setrgbcolor
+newpath cx cy 2.4 0 360 arc closepath fill
+
+% Dimensioning.
+0.08 0.10 0.11 setrgbcolor
+0.8 setlinewidth
+dimFont setfont
+
+% Diameter dimension.
+cx plateRadius sub cy plateRadius sub 34 sub
+cx plateRadius add cy plateRadius sub 34 sub dimArrow
+newpath cx plateRadius sub cy plateRadius sub moveto cx plateRadius sub cy plateRadius sub 42 sub lineto stroke
+newpath cx plateRadius add cy plateRadius sub moveto cx plateRadius add cy plateRadius sub 42 sub lineto stroke
+cx cy plateRadius sub 50 sub moveto (3.25 IN DIA, centered at 300 300) ctshow
+
+% Knob length dimension.
+cx 42 add cy hubRadius sub
+cx 42 add cy knobLength add dimArrow
+newpath cx knobWidth 2 div add cy hubRadius sub moveto cx 48 add cy hubRadius sub lineto stroke
+newpath cx knobWidth 2 div add cy knobLength add moveto cx 48 add cy knobLength add lineto stroke
+gsave
+  cx 58 add cy knobLength 2 div add translate
+  90 rotate
+  0 0 moveto (1.24 IN HANDLE) ctshow
+grestore
+
+% Center coordinate callout.
+newpath cx cy moveto 402 382 lineto stroke
+404 386 moveto ((300, 300) pivot) show
+
+% Footer source note.
+smallFont setfont
+0.30 0.30 0.30 setrgbcolor
+54 56 moveto (References consulted: Cessna 180 fuel selector plate listings and Cessna 180 owner manual fuel selector positions.) show
+54 44 moveto (Use only as an editable artwork/programming study; verify all cockpit placards against approved aircraft data.) show
+
+grestore
+showpage
+%%EOF
