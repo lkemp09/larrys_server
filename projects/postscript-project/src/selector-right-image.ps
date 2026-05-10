@@ -1,0 +1,142 @@
+%!PS-Adobe-3.0
+%%Title: Fuel Selector Right-Hand Reference Image
+%%Creator: postscript-project
+%%Pages: 1
+%%BoundingBox: 0 0 612 792
+%%EndComments
+
+/cx 306 def
+/cy 390 def
+/plateR 170 def
+/fontBold /Helvetica-Bold findfont def
+/fontReg /Helvetica findfont def
+
+/centerShow {
+  dup stringwidth pop 2 div neg 0 rmoveto show
+} bind def
+
+/labelAt {
+  /txt exch def /y exch def /x exch def
+  x y moveto txt centerShow
+} bind def
+
+/lineLabel {
+  /txt exch def /y exch def /x exch def
+  x y moveto txt centerShow
+} bind def
+
+/screw {
+  /y exch def /x exch def
+  gsave
+    newpath
+    x y 9 0 360 arc
+    closepath
+    0.86 0.86 0.78 setrgbcolor fill
+    0.16 0.15 0.13 setrgbcolor
+    1 setlinewidth
+    newpath x y 9 0 360 arc closepath stroke
+    newpath x 5 sub y moveto x 5 add y lineto stroke
+    newpath x y 5 sub moveto x y 5 add lineto stroke
+    1 1 1 0.40 setcmykcolor
+    newpath x 3 sub y 3 add 2 0 360 arc closepath fill
+  grestore
+} bind def
+
+/arcText {
+  /txt exch def
+  /endAng exch def
+  /startAng exch def
+  /rad exch def
+  /len txt length def
+  /span endAng startAng sub def
+  0 1 len 1 sub {
+    /i exch def
+    /ang startAng span i 0.5 add mul len div add def
+    gsave
+      cx cy translate
+      ang rotate
+      0 rad translate
+      ang 90 add rotate
+      txt i 1 getinterval dup stringwidth pop 2 div neg 0 moveto show
+    grestore
+  } for
+} bind def
+
+%%Page: 1 1
+gsave
+
+% Page.
+1 1 1 setrgbcolor
+newpath 0 0 moveto 612 0 lineto 612 792 lineto 0 792 lineto closepath fill
+
+% Plate body.
+gsave
+  cx cy translate
+  0.015 0.014 0.012 setrgbcolor
+  newpath 0 0 plateR 0 360 arc closepath fill
+
+  % Subtle outer lip and inner shading rings.
+  0.22 0.21 0.19 setrgbcolor
+  5 setlinewidth
+  newpath 0 0 plateR 0 360 arc closepath stroke
+  0.10 0.095 0.085 setrgbcolor
+  2 setlinewidth
+  newpath 0 0 plateR 0.90 mul 0 360 arc closepath stroke
+  0.045 0.043 0.040 setrgbcolor
+  newpath 0 0 plateR 0.66 mul 0 360 arc closepath stroke
+grestore
+
+% White quadrant dividers.
+0.95 0.96 0.92 setrgbcolor
+5 setlinewidth
+newpath cx 116 sub cy moveto cx 116 add cy lineto stroke
+newpath cx cy moveto cx cy 86 sub lineto stroke
+
+% Text labels.
+0.97 0.98 0.94 setrgbcolor
+fontBold 16 scalefont setfont
+cx cy 88 add (BOTH) lineLabel
+cx cy 70 add (ON) lineLabel
+
+fontBold 15 scalefont setfont
+cx 71 sub cy 30 add (LEFT) lineLabel
+cx 71 sub cy 12 add (TANK) lineLabel
+cx 71 add cy 30 add (RIGHT) lineLabel
+cx 71 add cy 12 add (TANK) lineLabel
+
+fontBold 16 scalefont setfont
+cx 71 sub cy 24 sub (18.5) lineLabel
+cx 71 sub cy 45 sub (GAL) lineLabel
+cx 71 add cy 24 sub (18.5) lineLabel
+cx 71 add cy 45 sub (GAL) lineLabel
+
+fontBold 16 scalefont setfont
+cx 43 sub cy 78 sub (BOTH) lineLabel
+cx 43 sub cy 98 sub (OFF) lineLabel
+cx 43 add cy 78 sub (BOTH) lineLabel
+cx 43 add cy 98 sub (OFF) lineLabel
+
+fontBold 18 scalefont setfont
+cx 70 add cy 86 add (37) lineLabel
+cx 70 add cy 65 add (GAL) lineLabel
+
+% Screws.
+cx 100 sub cy 61 add screw
+cx 100 add cy 61 add screw
+cx 82 sub cy 56 sub screw
+cx 82 add cy 56 sub screw
+
+% Lower curved warning text.
+0.97 0.98 0.94 setrgbcolor
+fontBold 10 scalefont setfont
+135 227 143 (SWITCH TO SINGLE TANK OPERATION BEFORE) arcText
+228 315 143 (UPON REACHING CRUISE ALTITUDE ABOVE 5000 FEET) arcText
+
+% Caption matching the reference image context.
+0.42 0.42 0.42 setrgbcolor
+fontBold 30 scalefont setfont
+cx 150 moveto (After) centerShow
+
+grestore
+showpage
+%%EOF

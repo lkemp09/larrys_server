@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Live Abacus Calculator</title>
+    <link rel="stylesheet" href="/projects/abacus/styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace" aria-label="Live abacus calculator">
+        <div class="display-panel">
+          <div>
+            <p class="eyebrow">Live abacus calculator</p>
+            <h1>Abacus</h1>
+          </div>
+          <output id="valueDisplay" class="value-display" aria-live="polite">0</output>
+        </div>
+
+        <div class="controls">
+          <label class="field">
+            <span>Value</span>
+            <input id="numberInput" type="number" min="0" max="999999" step="1" value="0">
+          </label>
+          <button id="clearButton" type="button">Clear</button>
+          <a class="page-link" href="/">Menu</a>
+          <a class="page-link" href="/projects/altitude-indicator/">Altitude Indicator</a>
+        </div>
+
+        <div class="abacus" id="abacus" aria-label="Interactive abacus"></div>
+      </section>
+    </main>
+
+    <script src="/projects/abacus/script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,77 @@
+%!PS-Adobe-3.0
+%%Title: Hello PostScript
+%%Creator: postscript-project
+%%Pages: 1
+%%BoundingBox: 0 0 612 792
+%%EndComments
+
+/inch { 72 mul } bind def
+
+/titlefont /Helvetica-Bold findfont 36 scalefont def
+/bodyfont /Helvetica findfont 13 scalefont def
+/smallfont /Helvetica-Oblique findfont 10 scalefont def
+
+/circle {
+  newpath
+  0 360 arc
+  closepath
+} bind def
+
+/label {
+  moveto
+  show
+} bind def
+
+%%Page: 1 1
+gsave
+
+% Soft page background.
+0.96 0.97 0.95 setrgbcolor
+newpath
+0 0 moveto
+612 0 lineto
+612 792 lineto
+0 792 lineto
+closepath
+fill
+
+% Accent block.
+0.10 0.32 0.38 setrgbcolor
+newpath
+54 528 moveto
+558 528 lineto
+558 702 lineto
+54 702 lineto
+closepath
+fill
+
+% Simple geometric motif.
+gsave
+456 616 translate
+0.92 0.74 0.25 setrgbcolor
+0 0 46 circle fill
+0.88 0.28 0.24 setrgbcolor
+-56 -42 28 circle fill
+0.34 0.65 0.55 setrgbcolor
+-96 28 20 circle fill
+grestore
+
+% Text.
+1 1 1 setrgbcolor
+titlefont setfont
+(Hello, PostScript) 84 630 label
+
+bodyfont setfont
+(A tiny printable program: stack-based, vector-native, and still sharp.) 86 596 label
+
+0.12 0.14 0.13 setrgbcolor
+bodyfont setfont
+(Edit src/hello.ps, then run scripts/render.ps1 to generate build/hello.pdf.) 84 466 label
+
+smallfont setfont
+(Tip: PostScript is code, so every shape on this page is drawn by commands.) 84 438 label
+
+grestore
+showpage
+%%EOF
+

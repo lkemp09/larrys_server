@@ -1,0 +1,50 @@
+%!PS-Adobe-3.0
+%%Title: Hello Larry Spokes
+%%Creator: postscript-project
+%%Pages: 1
+%%BoundingBox: 0 0 612 792
+%%EndComments
+
+/labelFont /Helvetica-Bold findfont 16 scalefont def
+
+%%Page: 1 1
+gsave
+
+% Page background.
+1 1 1 setrgbcolor
+newpath
+0 0 moveto
+612 0 lineto
+612 792 lineto
+0 792 lineto
+closepath
+fill
+
+% Mark the requested point.
+0.88 0.10 0.10 setrgbcolor
+newpath
+300 300 5 0 360 arc
+closepath
+fill
+
+% Draw "Hello Larry" as spokes around the point at 300 300.
+labelFont setfont
+0.08 0.16 0.20 setrgbcolor
+
+0 30 330 {
+  /angle exch def
+  gsave
+    300 300 translate
+    angle rotate
+    newpath
+    0 0 moveto
+    120 0 lineto
+    stroke
+    (Hello Larry) 132 -5 moveto show
+  grestore
+} for
+
+grestore
+showpage
+%%EOF
+

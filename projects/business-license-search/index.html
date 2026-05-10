@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Business License Search</title>
+  <link rel="stylesheet" href="/projects/business-license-search/static/styles.css">
+</head>
+<body>
+  <main>
+    <header class="topbar">
+      <div>
+        <h1>Business License Search</h1>
+        <p>Querying <code>C:\dev\larrys_server\data\business-licenses\BusinessLicenses.accdb</code></p>
+      </div>
+      <div class="stat" id="count">Ready</div>
+    </header>
+    <form id="filters" class="filters">
+      <label>Search
+        <input name="search" placeholder="Business, owner, license, address">
+      </label>
+      <label>Status
+        <select name="status">
+          <option value="">Any</option>
+          <option>Active</option>
+          <option>Expired</option>
+          <option>Cancelled</option>
+        </select>
+      </label>
+      <label>City
+        <input name="city" placeholder="Anchorage">
+      </label>
+      <label>State
+        <input name="state" maxlength="2" placeholder="AK">
+      </label>
+      <label>Limit
+        <select name="limit">
+          <option>25</option>
+          <option selected>50</option>
+          <option>100</option>
+          <option>250</option>
+        </select>
+      </label>
+      <div class="actions">
+        <button type="submit">Search</button>
+        <button type="button" id="clearFilters" class="secondary">Clear</button>
+      </div>
+    </form>
+    <section id="results" class="results"></section>
+  </main>
+  <script>
+    window.BUSINESS_LICENSE_API_BASE = "/projects/business-license-search";
+  </script>
+  <script src="/projects/business-license-search/static/app.js"></script>
+</body>
+</html>
