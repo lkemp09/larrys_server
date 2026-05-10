@@ -282,11 +282,11 @@ const configCategories = [
   {
     id: "com",
     label: "COM radio",
-    defaultChoice: "val-com",
+    defaultChoice: "garmin-gtr205",
     choices: [
-      { id: "val-com", label: "VAL Avionics COM", equipment: [1600, 2800], install: [1800, 4500] },
-      { id: "garmin-gtr200", label: "Garmin GTR 200", equipment: [1800, 3000], install: [1800, 4500] },
+      { id: "garmin-gtr205", label: "Garmin GTR 205", equipment: [2700, 3600], install: [2200, 5500] },
       { id: "trig-ty96", label: "Trig TY96", equipment: [2200, 3400], install: [2000, 5000] },
+      { id: "icom-ica220-tso", label: "Icom IC-A220 TSO", equipment: [1800, 2800], install: [2000, 5000] },
       { id: "none-com", label: "Retain existing COM", equipment: [0, 0], install: [0, 1000] },
     ],
   },
