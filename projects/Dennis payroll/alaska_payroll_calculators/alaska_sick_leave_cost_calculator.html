@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alaska Paid Sick Leave Cost Calculator</title>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;background:#f4f6f8;margin:0;color:#1f2933}
+.wrap{max-width:900px;margin:30px auto;padding:0 16px}
+header{background:#17324d;color:#fff;padding:24px;border-radius:12px 12px 0 0}
+main{background:#fff;padding:24px;border-radius:0 0 12px 12px;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+label{display:block;font-weight:bold;margin-bottom:6px}
+input,select{width:100%;padding:10px;border:1px solid #aebdca;border-radius:7px;font-size:16px;box-sizing:border-box}
+.note{background:#eef5f9;border-left:5px solid #2f6f9f;padding:14px;margin-bottom:20px;line-height:1.45}
+.hint{font-size:13px;color:#596775;margin-top:5px}
+button{margin-top:20px;background:#2f6f9f;color:#fff;border:0;padding:12px 20px;border-radius:8px;font-size:17px;font-weight:bold;cursor:pointer}
+.results{margin-top:24px;border:1px solid #cbd8e2;border-radius:10px;overflow:hidden}
+.results h2{margin:0;background:#17324d;color:#fff;padding:14px}
+.row{display:flex;justify-content:space-between;padding:11px 16px;border-top:1px solid #cbd8e2;gap:20px}
+.emphasis{background:#eaf6ec;font-size:18px}
+.small{font-size:13px;color:#56616b;line-height:1.45;margin-top:18px}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.row{flex-direction:column;gap:3px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Alaska Paid Sick Leave Cost Calculator</h1>
+<p>Estimate the cost of one hour of paid sick leave earned for every 30 hours worked.</p>
+</header>
+<main>
+<div class="note"><strong>Rule of thumb:</strong> one hour for every 30 hours worked equals a maximum direct wage cost of about <strong>3.33%</strong>, before payroll taxes, workers' compensation, benefits, or other payroll burden.</div>
+
+<div class="grid">
+<div><label for="employees">Number of employees</label><input id="employees" type="number" min="1" step="1" value="1"></div>
+<div><label for="hours">Hours worked per employee</label><input id="hours" type="number" min="0" step="0.1" value="1200"></div>
+<div><label for="wage">Average hourly wage</label><input id="wage" type="number" min="0" step="0.01" value="30.00"></div>
+<div><label for="burden">Payroll burden percent</label><input id="burden" type="number" min="0" step="0.1" value="15"><div class="hint">Payroll taxes, workers' comp, benefits, etc.</div></div>
+<div><label for="usage">Percent of accrued sick leave expected to be used</label><input id="usage" type="number" min="0" max="100" step="1" value="100"></div>
+<div><label for="cap">Annual cap per employee</label><select id="cap"><option value="40">40 hours — fewer than 15 employees</option><option value="56">56 hours — 15 or more employees</option><option value="999999">No annual cap applied</option></select></div>
+<div><label for="billrate">Current customer billing rate</label><input id="billrate" type="number" min="0" step="0.01" value="100.00"></div>
+<div><label for="recovery">Recovery factor</label><input id="recovery" type="number" min="1" step="0.01" value="1.00"><div class="hint">1.00 recovers cost only. Increase it to preserve profit margin.</div></div>
+</div>
+
+<button onclick="calculate()">Calculate Cost</button>
+
+<section class="results">
+<h2>Estimated Results</h2>
+<div class="row"><span>Sick leave earned per employee</span><strong id="sickPer">—</strong></div>
+<div class="row"><span>Total sick leave expected to be used</span><strong id="sickTotal">—</strong></div>
+<div class="row"><span>Direct wage cost</span><strong id="directCost">—</strong></div>
+<div class="row"><span>Payroll burden</span><strong id="burdenCost">—</strong></div>
+<div class="row emphasis"><span>Total added cost</span><strong id="totalCost">—</strong></div>
+<div class="row"><span>Added cost per hour worked</span><strong id="costPerHour">—</strong></div>
+<div class="row"><span>Suggested billing-rate increase</span><strong id="increase">—</strong></div>
+<div class="row emphasis"><span>Suggested new billing rate</span><strong id="newRate">—</strong></div>
+</section>
+
+<p class="small">This estimating tool assumes accrued leave is used. Actual cost may differ because of existing PTO policies, employee eligibility, leave usage, wage differences, overtime, payroll taxes, and replacement labor.</p>
+</main>
+</div>
+<script>
+const n=id=>parseFloat(document.getElementById(id).value)||0;
+const money=x=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(x||0);
+const number=x=>new Intl.NumberFormat('en-US',{maximumFractionDigits:2}).format(x||0);
+function calculate(){
+ const employees=Math.max(1,n('employees'));
+ const hours=Math.max(0,n('hours'));
+ const wage=Math.max(0,n('wage'));
+ const burden=Math.max(0,n('burden'))/100;
+ const usage=Math.min(100,Math.max(0,n('usage')))/100;
+ const cap=n('cap');
+ const billrate=Math.max(0,n('billrate'));
+ const recovery=Math.max(1,n('recovery'));
+ const sickPer=Math.min(hours/30,cap);
+ const sickTotal=sickPer*usage*employees;
+ const direct=sickTotal*wage;
+ const burdenCost=direct*burden;
+ const total=direct+burdenCost;
+ const totalHours=hours*employees;
+ const perHour=totalHours?total/totalHours:0;
+ const increase=perHour*recovery;
+ document.getElementById('sickPer').textContent=number(sickPer)+' hours';
+ document.getElementById('sickTotal').textContent=number(sickTotal)+' hours';
+ document.getElementById('directCost').textContent=money(direct);
+ document.getElementById('burdenCost').textContent=money(burdenCost);
+ document.getElementById('totalCost').textContent=money(total);
+ document.getElementById('costPerHour').textContent=money(perHour);
+ document.getElementById('increase').textContent=money(increase)+' per labor hour';
+ document.getElementById('newRate').textContent=money(billrate+increase)+' per labor hour';
+}
+calculate();
+</script>
+</body>
+</html>

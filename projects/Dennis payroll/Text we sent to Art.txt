@@ -1,0 +1,46 @@
+my friend says that last year the state of alaska told us that for every employee receives 1 hour of sick pay for every 30 hours of work. should our hourly rate increase to cover thew cost and by how much. could you create a web page where he could enter values for number of hours worked and get the extra cost we would incure. Really not sure how to write this but will work on it as we go along.
+
+Yes, Lyman. Your friend is remembering the rule correctly: Alaska’s paid sick-leave law took effect July 1, 2025, and covered employees generally earn one hour of paid sick leave for every 30 hours worked. Employers with fewer than 15 employees may cap annual accrual at 40 hours; employers with 15 or more may cap it at 56 hours. An existing PTO plan can satisfy the requirement when it meets the law’s accrual and use rules.
+
+For pricing purposes, that works out to a maximum direct labor cost of:
+
+1 ÷ 30 = 3.33% of wages
+
+So, for a $30-per-hour employee:
+
+Sick-leave wage cost is about $1.00 for every hour worked
+With a 15% payroll burden, it becomes about $1.15 per hour
+That is the amount the customer billing rate would need to rise just to recover the estimated cost, assuming all accrued sick leave is eventually used
+
+I built a webpage where he can enter employee count, hours worked, wages, payroll burden, expected leave usage, company size, and the current customer billing rate.
+
+alaska_sick_leave_cost_calculator.html
+
+It is better to describe this as an increase to the customer labor or billing rate, rather than an increase to the employee’s hourly wage. The calculator is an estimating tool; payroll or accounting advice should be used before changing company-wide rates. 
+
+can you help us with the acutal payroll burden by querying ibew union mandates and other things that effect that number and create another webpage that will give us that number
+
+Yes, Lyman. I built a more complete calculator for him:
+
+alaska_electrical_payroll_burden_calculator.html
+
+It calculates:
+
+Employer Social Security and Medicare
+Alaska unemployment insurance
+Federal unemployment tax
+Workers’ compensation
+General liability and other payroll-based costs
+IBEW health, pension, retirement, training, NEBF, LMCC and related contributions
+Paid sick leave, vacation and holidays
+Loaded cost per paid hour
+Loaded cost per productive hour
+A suggested customer billing rate based on the desired profit margin
+
+I entered the posted 2026 Local 1547 journeyman wireman wage of $57.44 per hour as an example.
+
+The important limitation is that there is no single IBEW payroll-burden percentage for every Alaska electrical company. Alaska Electrical Trust Funds says contribution rates vary according to the particular collective bargaining agreement or special agreement. Health, pension, retirement savings, training and other amounts may be hourly or percentage-based, depending on that agreement.
+
+The calculator therefore leaves the actual union contribution amounts open for him to enter from his current monthly remittance form or CBA. The federal defaults include 6.2% employer Social Security and 1.45% Medicare. Alaska’s 2026 unemployment wage base is $54,200, and the standard employer rate shown by the state is 1.50%, although his company’s assigned experience rate may differ.
+
+The most useful next document would be his current IBEW/NECA contribution-rate sheet or collective bargaining agreement. With that, we can enter the exact numbers instead of estimates. 
