@@ -13,7 +13,7 @@ Read relevant files in `docs/` before planning or changing related parts of the 
 
 Files may be read freely.
 
-No files may be created, modified, moved, renamed, deleted, staged, committed, or otherwise changed unless the user has explicitly given one of these exact approvals in the current request:
+No files may be created, modified, moved, renamed, deleted, staged, committed, or otherwise changed unless the user has explicitly given one of these exact approvals in the current request: 
 
 - `go`
 - `Go`
