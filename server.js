@@ -10,6 +10,11 @@ let businessPool;
 
 const projects = [
   {
+    slug: "alaska-ferry-days",
+    title: "Alaska Ferry Days",
+    description: "Find published Alaska ferry sailing dates by departure and destination.",
+  },
+  {
     slug: "business-license-search",
     title: "Business License Search",
     description: "Search the Alaska business license database.",
