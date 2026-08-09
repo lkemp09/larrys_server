@@ -14,6 +14,8 @@ The Node app starts with `npm start`, which runs `node server.js`. The server re
 
 The Railway app service has a `DATABASE_URL` variable configured for PostgreSQL access. The PostgreSQL password / connection secret is stored locally in the repository's `passwords/` directory, currently `passwords/passwords.txt`.
 
+Both `larrys_server` and `Postgres` must have Railway's serverless / sleep-application setting enabled while the project is on the Free plan. A redeploy of an older PostgreSQL deployment can reuse its previous non-serverless manifest and fail; after changing the setting, deploy the database from its current image/source so the new setting is included.
+
 The `passwords/` directory is intended for local-only secrets and should stay out of Git.
 
 The business license search app queries Railway PostgreSQL directly through `DATABASE_URL` and uses schema `bus_lic`.
