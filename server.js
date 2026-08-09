@@ -2,6 +2,7 @@ const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
 const { Pool } = require("pg");
+const { handleFerryApi } = require("./lib/ferry-api");
 
 const port = Number(process.env.PORT) || 3000;
 const rootDir = __dirname;
@@ -573,6 +574,11 @@ function handleProject(request, requestUrl, response) {
 
   if (!project) {
     sendText(response, 404, "Project not found");
+    return;
+  }
+
+  if (slug === "alaska-ferry-days" && parts[2] === "api") {
+    handleFerryApi(request, requestUrl, response, parts.slice(3));
     return;
   }
 

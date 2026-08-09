@@ -12,6 +12,14 @@ The business license search app uses the `bus_lic` schema. Its seed data is load
 npm run import:business-licenses
 ```
 
+The Alaska Ferry Days app uses the `alaska_ferry` schema. Its published AMHS schedule data is refreshed from the State of Alaska calendar with:
+
+```bash
+npm run import:alaska-ferry
+```
+
+The ferry importer currently loads departures from September 1, 2026 through April 30, 2027. Use `npm run import:alaska-ferry -- --dry-run` to download and validate the source schedule without changing PostgreSQL.
+
 Example:
 
 ```sql

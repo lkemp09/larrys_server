@@ -6,6 +6,7 @@
     "pg": "^8.13.1"
   },
   "scripts": {
+    "import:alaska-ferry": "node scripts/import-alaska-ferry-postgres.js",
     "import:business-licenses": "node scripts/import-business-licenses-postgres.js",
     "start": "node server.js"
   }
