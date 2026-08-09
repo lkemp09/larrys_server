@@ -18,7 +18,7 @@ The Alaska Ferry Days app uses the `alaska_ferry` schema. Its published AMHS sch
 npm run import:alaska-ferry
 ```
 
-The ferry importer currently loads departures from September 1, 2026 through April 30, 2027. Use `npm run import:alaska-ferry -- --dry-run` to download and validate the source schedule without changing PostgreSQL.
+The ferry importer currently loads departures from August 1, 2026 through April 30, 2027. Use `npm run import:alaska-ferry -- --dry-run` to download and validate the source schedule without changing PostgreSQL.
 
 Example:
 

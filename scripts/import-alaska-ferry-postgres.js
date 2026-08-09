@@ -3,6 +3,7 @@ const { Pool } = require("pg");
 const schemaName = "alaska_ferry";
 const sourceBase = "https://dot.alaska.gov/oars/reservations";
 const months = [
+  "August 2026",
   "September 2026",
   "October 2026",
   "November 2026",
@@ -160,7 +161,7 @@ async function downloadSchedule() {
   const unique = new Map();
   for (const sailing of details.flat()) {
     const date = sailing.departureAt.slice(0, 10);
-    if (date < "2026-09-01" || date > "2027-04-30") continue;
+    if (date < "2026-08-01" || date > "2027-04-30") continue;
     const key = [sailing.scheduleId, sailing.fromPort, sailing.toPort, sailing.departureAt, sailing.arrivalAt].join("|");
     unique.set(key, sailing);
   }
