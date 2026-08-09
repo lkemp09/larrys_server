@@ -247,6 +247,9 @@
     .secondary-action { border: 1px solid #a8c5c2; background: #fff; color: var(--teal); }
     .primary-action { border: 1px solid var(--teal); background: var(--teal); color: #fff; }
     .handoff-note { margin: 18px 0 0; padding-top: 17px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .autofill-setup { margin: 0 0 22px; padding: 15px 17px; border: 1px solid #b9d4cf; border-radius: 9px; background: #edf5f2; font-size: 13px; line-height: 1.55; }
+    .autofill-setup strong { display: block; margin-bottom: 5px; }
+    .bookmarklet { display: inline-block; margin-top: 10px; padding: 9px 13px; border-radius: 7px; background: var(--navy); color: #fff; font-weight: 800; text-decoration: none; cursor: grab; }
 
     .note {
       max-width: 1060px;
@@ -362,12 +365,17 @@
         </div>
       </fieldset>
       <p class="form-help">Cabin types and prices depend on the vessel. AMHS will show the cabins actually available after you select the sailing.</p>
+      <div class="autofill-setup">
+        <strong>One-time setup for automatic transfer</strong>
+        In Chrome or Edge, show your bookmarks bar, then drag the button below onto it. On each AMHS screen, click that bookmark to fill or select the saved choices.
+        <br><a class="bookmarklet" id="autofill-bookmark" href="#" title="Drag this button to your bookmarks bar">AMHS Autofill</a>
+      </div>
       <p class="form-error" id="reservation-error" role="alert"></p>
       <div class="reservation-actions">
         <button class="secondary-action" id="copy-reservation" type="button">Copy details</button>
         <button class="primary-action" id="continue-reservation" type="button">Continue at AMHS ↗</button>
       </div>
-      <p class="handoff-note">Your checklist will be copied and the official AMHS booking system will open. Complete the same selections there, choose an available cabin, then enter traveler names and payment directly with AMHS. Larry’s Server does not receive or store personal or payment information.</p>
+      <p class="handoff-note">Your choices will be copied and the official AMHS booking system will open. Click your AMHS Autofill bookmark on the search, availability, and cabin screens. Review every selection, then enter traveler names and payment directly with AMHS. Larry’s Server does not receive or store personal or payment information.</p>
     </form>
   </dialog>
 
@@ -376,6 +384,7 @@
     These are published sailing dates, not live passenger or vehicle availability. Schedules can change. Confirm your sailing and complete your reservation with Alaska Marine Highway.
   </section>
 
+  <script src="./amhs-autofill.js"></script>
   <script>
     const apiBase = "/projects/alaska-ferry-days/api";
     const month = document.getElementById("month");
@@ -483,6 +492,7 @@
       }
 
       const selectedVehicle = vehicleType.value;
+      let vehicle = { type: "none", lengthFeet: 0 };
       let vehicleDescription = "No vehicle";
       if (selectedVehicle !== "None") {
         const length = Number(vehicleLength.value);
@@ -490,10 +500,28 @@
           throw new Error("Enter a vehicle length from 1 to 30 feet.");
         }
         vehicleDescription = `${selectedVehicle}, ${length} feet total length`;
+        vehicle = { type: selectedVehicle.startsWith("Electric") ? "electric" : "standard", lengthFeet: length };
       }
 
+      const cabinLabel = document.getElementById("cabin-preference").value;
+      const payload = {
+        fromCode: activeSailing.fromCode,
+        toCode: activeSailing.toCode,
+        fromName: activeSailing.fromName,
+        toName: activeSailing.toName,
+        departureDate: activeSailing.departureDate,
+        departureTime: activeSailing.departureTime,
+        departureTimeLabel: formatTime(activeSailing.departureTime),
+        vessel: activeSailing.vessel,
+        passengers: {
+          adults: passengers[0][1], seniors: passengers[1][1],
+          children: passengers[2][1], infants: passengers[3][1],
+        },
+        vehicle,
+        cabinPreference: cabinLabel.startsWith("Inside") ? "inside" : cabinLabel.startsWith("Outside") ? "outside" : cabinLabel.startsWith("Accessible") ? "accessible" : "none",
+      };
       const passengerLines = passengers.filter(([, count]) => count > 0).map(([label, count]) => `• ${label}: ${count}`);
-      return [
+      const checklist = [
         "ALASKA FERRY RESERVATION CHECKLIST",
         "",
         `Route: ${activeSailing.fromName} to ${activeSailing.toName}`,
@@ -504,10 +532,11 @@
         "Passengers:",
         ...passengerLines,
         `Vehicle: ${vehicleDescription}`,
-        `Cabin preference: ${document.getElementById("cabin-preference").value}`,
+        `Cabin preference: ${cabinLabel}`,
         "",
         "Confirm availability, final price, cabin, traveler details, and payment with AMHS.",
       ].join("\n");
+      return `ALASKA_FERRY_AUTOFILL_V1:${JSON.stringify(payload)}\n${checklist}`;
     }
 
     async function copyReservationDetails() {
@@ -634,12 +663,18 @@
       if (officialWindow) officialWindow.opener = null;
       const copied = await copyReservationDetails();
       reservationError.textContent = officialWindow
-        ? (copied ? "AMHS opened and your checklist was copied." : "AMHS opened. Keep this window available while entering the details.")
+        ? (copied ? "AMHS opened. Click your AMHS Autofill bookmark on that page." : "AMHS opened. Keep this window available while entering the details.")
         : "Your browser blocked the new tab. Allow pop-ups, then try again.";
     });
 
     async function initialize() {
       try {
+        const bookmark = document.getElementById("autofill-bookmark");
+        bookmark.href = window.alaskaFerryAutofillBookmarklet;
+        bookmark.addEventListener("click", (event) => {
+          event.preventDefault();
+          reservationError.textContent = "Drag AMHS Autofill to your bookmarks bar; do not click it on this page.";
+        });
         const data = await getJson("/ports");
         portNames = Object.fromEntries(data.ports.map((port) => [port.code, port.name]));
         setOptions(month, data.months, "All published months");
