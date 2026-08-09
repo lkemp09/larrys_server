@@ -184,12 +184,69 @@
       padding: 12px 16px;
       border: 1px solid #a8c5c2;
       border-radius: 8px;
+      background: #fff;
       color: var(--teal);
+      cursor: pointer;
+      font-family: inherit;
       font-size: 13px;
       font-weight: 750;
       text-decoration: none;
       white-space: nowrap;
     }
+
+    dialog {
+      width: min(760px, calc(100vw - 32px));
+      max-height: calc(100vh - 32px);
+      padding: 0;
+      border: 0;
+      border-radius: 16px;
+      background: var(--paper);
+      color: var(--ink);
+      box-shadow: 0 30px 100px rgba(3, 38, 48, .32);
+    }
+    dialog::backdrop { background: rgba(3, 25, 32, .72); }
+    .reservation-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 28px 30px 22px;
+      border-bottom: 1px solid var(--line);
+      background: #edf5f2;
+    }
+    .reservation-head h2 { margin: 4px 0 0; font: 400 32px Georgia, serif; }
+    .close-dialog { border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 28px; line-height: 1; }
+    .trip-summary { padding: 20px 30px; border-bottom: 1px solid var(--line); }
+    .trip-summary strong { display: block; margin-bottom: 6px; font-size: 18px; }
+    .trip-summary span { color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .reservation-form { padding: 24px 30px 30px; }
+    .reservation-form fieldset { margin: 0 0 22px; padding: 0; border: 0; }
+    .reservation-form legend { margin-bottom: 14px; font: 400 22px Georgia, serif; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .reservation-form input, .reservation-form select {
+      width: 100%;
+      height: 52px;
+      border: 1px solid #cbd9d6;
+      border-radius: 8px;
+      background: #fff;
+      padding: 0 14px;
+      color: var(--ink);
+      font: 650 15px Inter, ui-sans-serif, system-ui, sans-serif;
+    }
+    .vehicle-length[hidden] { display: none; }
+    .form-help { margin: -8px 0 22px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .form-error { min-height: 21px; margin: 0 0 10px; color: #a13a2c; font-size: 13px; font-weight: 700; }
+    .reservation-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+    .secondary-action, .primary-action {
+      min-height: 46px;
+      padding: 0 17px;
+      border-radius: 8px;
+      cursor: pointer;
+      font: 750 14px Inter, ui-sans-serif, system-ui, sans-serif;
+    }
+    .secondary-action { border: 1px solid #a8c5c2; background: #fff; color: var(--teal); }
+    .primary-action { border: 1px solid var(--teal); background: var(--teal); color: #fff; }
+    .handoff-note { margin: 18px 0 0; padding-top: 17px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; line-height: 1.55; }
 
     .note {
       max-width: 1060px;
@@ -224,6 +281,9 @@
       .line { width: 46px; }
       .line span { display: none; }
       .book { grid-column: 2; width: max-content; margin: 0 0 18px; }
+      .reservation-head, .trip-summary, .reservation-form { padding-left: 20px; padding-right: 20px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .reservation-actions { align-items: stretch; flex-direction: column; }
     }
   </style>
 </head>
@@ -259,6 +319,58 @@
     <div class="empty"><h2>Loading the ferry schedule</h2><p>The published sailing dates are being retrieved from the database.</p></div>
   </main>
 
+  <dialog id="reservation-dialog" aria-labelledby="reservation-title">
+    <div class="reservation-head">
+      <div><p class="kicker">Guided AMHS handoff</p><h2 id="reservation-title">Build your reservation</h2></div>
+      <button class="close-dialog" id="close-reservation" type="button" aria-label="Close reservation builder">×</button>
+    </div>
+    <div class="trip-summary" id="reservation-trip"></div>
+    <form class="reservation-form" id="reservation-form">
+      <fieldset>
+        <legend>People</legend>
+        <div class="form-grid">
+          <div><label for="adult-count">Adults 12–64</label><input id="adult-count" type="number" min="0" max="9" value="1"></div>
+          <div><label for="senior-count">Seniors 65+</label><input id="senior-count" type="number" min="0" max="9" value="0"></div>
+          <div><label for="child-count">Children 6–11</label><input id="child-count" type="number" min="0" max="9" value="0"></div>
+          <div><label for="infant-count">Children 0–5</label><input id="infant-count" type="number" min="0" max="9" value="0"></div>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Vehicle and cabin</legend>
+        <div class="form-grid">
+          <div>
+            <label for="vehicle-type">Vehicle</label>
+            <select id="vehicle-type">
+              <option value="None">No vehicle</option>
+              <option value="Gas/diesel car, truck, or SUV">Gas/diesel car, truck, or SUV</option>
+              <option value="Electric car, truck, or SUV">Electric car, truck, or SUV</option>
+            </select>
+          </div>
+          <div class="vehicle-length" id="vehicle-length-wrap" hidden>
+            <label for="vehicle-length">Total length in feet</label>
+            <input id="vehicle-length" type="number" min="1" max="30" step="1" inputmode="numeric" placeholder="Example: 18">
+          </div>
+          <div>
+            <label for="cabin-preference">Cabin preference</label>
+            <select id="cabin-preference">
+              <option value="No cabin">No cabin</option>
+              <option value="Inside cabin">Inside cabin</option>
+              <option value="Outside cabin">Outside cabin</option>
+              <option value="Accessible cabin request">Accessible cabin request</option>
+            </select>
+          </div>
+        </div>
+      </fieldset>
+      <p class="form-help">Cabin types and prices depend on the vessel. AMHS will show the cabins actually available after you select the sailing.</p>
+      <p class="form-error" id="reservation-error" role="alert"></p>
+      <div class="reservation-actions">
+        <button class="secondary-action" id="copy-reservation" type="button">Copy details</button>
+        <button class="primary-action" id="continue-reservation" type="button">Continue at AMHS ↗</button>
+      </div>
+      <p class="handoff-note">Your checklist will be copied and the official AMHS booking system will open. Complete the same selections there, choose an available cabin, then enter traveler names and payment directly with AMHS. Larry’s Server does not receive or store personal or payment information.</p>
+    </form>
+  </dialog>
+
   <section class="note">
     <strong>Before you reserve</strong>
     These are published sailing dates, not live passenger or vehicle availability. Schedules can change. Confirm your sailing and complete your reservation with Alaska Marine Highway.
@@ -272,7 +384,16 @@
     const swap = document.getElementById("swap");
     const results = document.getElementById("results");
     const databaseStatus = document.getElementById("database-status");
+    const reservationDialog = document.getElementById("reservation-dialog");
+    const reservationForm = document.getElementById("reservation-form");
+    const reservationTrip = document.getElementById("reservation-trip");
+    const reservationError = document.getElementById("reservation-error");
+    const vehicleType = document.getElementById("vehicle-type");
+    const vehicleLengthWrap = document.getElementById("vehicle-length-wrap");
+    const vehicleLength = document.getElementById("vehicle-length");
     let portNames = {};
+    let currentSailings = [];
+    let activeSailing = null;
 
     function escapeHtml(value) {
       return String(value).replace(/[&<>"']/g, (character) => ({
@@ -280,11 +401,20 @@
       })[character]);
     }
 
-    async function getJson(path) {
-      const response = await fetch(`${apiBase}${path}`);
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "The schedule could not be loaded.");
-      return data;
+    async function getJson(path, attempts = 4) {
+      let lastError;
+      for (let attempt = 1; attempt <= attempts; attempt++) {
+        try {
+          const response = await fetch(`${apiBase}${path}`);
+          const data = await response.json();
+          if (response.ok) return data;
+          lastError = new Error(data.error || "The schedule could not be loaded.");
+        } catch (error) {
+          lastError = error;
+        }
+        if (attempt < attempts) await new Promise((resolve) => setTimeout(resolve, 2500));
+      }
+      throw lastError;
     }
 
     function setOptions(select, items, prompt) {
@@ -327,6 +457,71 @@
       return [days ? `${days}d` : "", hours ? `${hours}h` : "", remainder ? `${remainder}m` : ""].filter(Boolean).join(" ");
     }
 
+    function openReservation(sailing) {
+      activeSailing = sailing;
+      reservationForm.reset();
+      vehicleLengthWrap.hidden = true;
+      vehicleLength.required = false;
+      reservationError.textContent = "";
+      reservationTrip.innerHTML = `<strong>${escapeHtml(sailing.fromName)} to ${escapeHtml(sailing.toName)}</strong><span>${escapeHtml(formatDate(sailing.departureDate))} at ${escapeHtml(formatTime(sailing.departureTime))} • ${escapeHtml(sailing.vessel)} • arrives ${escapeHtml(formatDate(sailing.arrivalDate))} at ${escapeHtml(formatTime(sailing.arrivalTime))}</span>`;
+      reservationDialog.showModal();
+    }
+
+    function reservationDetails() {
+      if (!activeSailing) return null;
+      const passengers = [
+        ["Adults 12–64", Number(document.getElementById("adult-count").value)],
+        ["Seniors 65+", Number(document.getElementById("senior-count").value)],
+        ["Children 6–11", Number(document.getElementById("child-count").value)],
+        ["Children 0–5", Number(document.getElementById("infant-count").value)],
+      ];
+      if (passengers.some(([, count]) => !Number.isInteger(count) || count < 0 || count > 9)) {
+        throw new Error("Each passenger count must be between 0 and 9.");
+      }
+      if (!passengers.some(([, count]) => count > 0)) {
+        throw new Error("Add at least one passenger.");
+      }
+
+      const selectedVehicle = vehicleType.value;
+      let vehicleDescription = "No vehicle";
+      if (selectedVehicle !== "None") {
+        const length = Number(vehicleLength.value);
+        if (!Number.isFinite(length) || length < 1 || length > 30) {
+          throw new Error("Enter a vehicle length from 1 to 30 feet.");
+        }
+        vehicleDescription = `${selectedVehicle}, ${length} feet total length`;
+      }
+
+      const passengerLines = passengers.filter(([, count]) => count > 0).map(([label, count]) => `• ${label}: ${count}`);
+      return [
+        "ALASKA FERRY RESERVATION CHECKLIST",
+        "",
+        `Route: ${activeSailing.fromName} to ${activeSailing.toName}`,
+        `Departure: ${formatDate(activeSailing.departureDate)} at ${formatTime(activeSailing.departureTime)}`,
+        `Arrival: ${formatDate(activeSailing.arrivalDate)} at ${formatTime(activeSailing.arrivalTime)}`,
+        `Vessel: ${activeSailing.vessel}`,
+        "",
+        "Passengers:",
+        ...passengerLines,
+        `Vehicle: ${vehicleDescription}`,
+        `Cabin preference: ${document.getElementById("cabin-preference").value}`,
+        "",
+        "Confirm availability, final price, cabin, traveler details, and payment with AMHS.",
+      ].join("\n");
+    }
+
+    async function copyReservationDetails() {
+      try {
+        const details = reservationDetails();
+        await navigator.clipboard.writeText(details);
+        reservationError.textContent = "Reservation details copied.";
+        return true;
+      } catch (error) {
+        reservationError.textContent = error.message;
+        return false;
+      }
+    }
+
     async function loadDestinations(preferredValue = "") {
       const from = departure.value;
       destination.disabled = true;
@@ -357,6 +552,7 @@
       try {
         const data = await getJson(`/sailings?${query}`);
         const rows = data.sailings;
+        currentSailings = rows;
         if (!rows.length) {
           showMessage("No published sailings", "The schedule does not show a continuous sailing for this route in the chosen period.");
           return;
@@ -364,7 +560,7 @@
 
         const days = new Set(rows.map((sailing) => sailing.departureDate)).size;
         const routeTitle = `${portNames[departure.value]} to ${portNames[destination.value]}`;
-        const cards = rows.map((sailing) => {
+        const cards = rows.map((sailing, index) => {
           const date = dateParts(sailing.departureDate);
           return `<article class="card">
             <div class="date"><span>${date.weekday}</span><strong>${date.day}</strong><small>${date.month}</small></div>
@@ -377,11 +573,14 @@
               </div>
               <p class="vessel">${escapeHtml(sailing.vessel)} • ${escapeHtml(sailing.fromName)} → ${escapeHtml(sailing.toName)}${sailing.arrivalDate !== sailing.departureDate ? ` • arrives ${escapeHtml(formatDate(sailing.arrivalDate))}` : ""}</p>
             </div>
-            <a class="book" href="https://bookamhs.alaska.gov/book/sailing-search/journeySearch" target="_blank" rel="noopener">Check availability ↗</a>
+            <button class="book" type="button" data-reservation-index="${index}">Build reservation</button>
           </article>`;
         }).join("");
 
         results.innerHTML = `<header class="results-head"><div><p class="kicker">${days} travel ${days === 1 ? "day" : "days"} found</p><h2>${escapeHtml(routeTitle)}</h2></div></header><div class="cards">${cards}</div>`;
+        results.querySelectorAll("[data-reservation-index]").forEach((button) => {
+          button.addEventListener("click", () => openReservation(currentSailings[Number(button.dataset.reservationIndex)]));
+        });
       } catch (error) {
         showMessage("Schedule temporarily unavailable", error.message);
       }
@@ -415,6 +614,28 @@
       } catch (error) {
         showMessage("Reverse route unavailable", error.message);
       }
+    });
+    document.getElementById("close-reservation").addEventListener("click", () => reservationDialog.close());
+    vehicleType.addEventListener("change", () => {
+      const hasVehicle = vehicleType.value !== "None";
+      vehicleLengthWrap.hidden = !hasVehicle;
+      vehicleLength.required = hasVehicle;
+      if (!hasVehicle) vehicleLength.value = "";
+    });
+    document.getElementById("copy-reservation").addEventListener("click", copyReservationDetails);
+    document.getElementById("continue-reservation").addEventListener("click", async () => {
+      try {
+        reservationDetails();
+      } catch (error) {
+        reservationError.textContent = error.message;
+        return;
+      }
+      const officialWindow = window.open("https://bookamhs.alaska.gov/book/sailing-search/journeySearch/?clear", "_blank");
+      if (officialWindow) officialWindow.opener = null;
+      const copied = await copyReservationDetails();
+      reservationError.textContent = officialWindow
+        ? (copied ? "AMHS opened and your checklist was copied." : "AMHS opened. Keep this window available while entering the details.")
+        : "Your browser blocked the new tab. Allow pop-ups, then try again.";
     });
 
     async function initialize() {
