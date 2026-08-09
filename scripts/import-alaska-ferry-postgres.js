@@ -114,10 +114,14 @@ function parseDetails(html, scheduleId) {
   for (let departureIndex = 0; departureIndex < events.length; departureIndex++) {
     const departure = events[departureIndex];
     if (departure.type !== "Dp" || departure.status !== "ACTIVE") continue;
+    const seenDestinations = new Set();
 
     for (let arrivalIndex = departureIndex + 1; arrivalIndex < events.length; arrivalIndex++) {
       const arrival = events[arrivalIndex];
-      if (arrival.type !== "Ar" || arrival.status !== "ACTIVE" || arrival.port === departure.port) continue;
+      if (arrival.type !== "Ar" || arrival.status !== "ACTIVE") continue;
+      if (arrival.port === departure.port) break;
+      if (seenDestinations.has(arrival.port)) continue;
+      seenDestinations.add(arrival.port);
       sailings.push({
         scheduleId,
         vesselCode,
@@ -230,13 +234,28 @@ async function insertSailings(client, sailings) {
   }
 }
 
+async function connectWithRetry(pool, attempts = 10) {
+  let lastError;
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      return await pool.connect();
+    } catch (error) {
+      lastError = error;
+      if (attempt === attempts) break;
+      console.log(`Database connection attempt ${attempt} failed; retrying in 3 seconds...`);
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+    }
+  }
+  throw lastError;
+}
+
 async function importSchedule(sailings) {
   if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required.");
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: process.env.PGSSLMODE === "require" ? { rejectUnauthorized: false } : undefined,
   });
-  const client = await pool.connect();
+  const client = await connectWithRetry(pool);
   try {
     await client.query("BEGIN");
     await createSchema(client);
