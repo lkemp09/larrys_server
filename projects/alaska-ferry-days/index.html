@@ -249,7 +249,12 @@
     .handoff-note { margin: 18px 0 0; padding-top: 17px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; line-height: 1.55; }
     .autofill-setup { margin: 0 0 22px; padding: 15px 17px; border: 1px solid #b9d4cf; border-radius: 9px; background: #edf5f2; font-size: 13px; line-height: 1.55; }
     .autofill-setup strong { display: block; margin-bottom: 5px; }
-    .bookmarklet { display: inline-block; margin-top: 10px; padding: 9px 13px; border-radius: 7px; background: var(--navy); color: #fff; font-weight: 800; text-decoration: none; cursor: grab; }
+    .extension-download { display: inline-block; margin-top: 10px; padding: 9px 13px; border-radius: 7px; background: var(--navy); color: #fff; font-weight: 800; text-decoration: none; }
+    .extension-status { margin: 9px 0 0; color: #536b70; font-weight: 700; }
+    .extension-status.ready { color: #08704e; }
+    .install-steps { margin-top: 12px; }
+    .install-steps summary { color: var(--teal); cursor: pointer; font-weight: 800; }
+    .install-steps ol { margin: 9px 0 0; padding-left: 21px; }
 
     .note {
       max-width: 1060px;
@@ -366,16 +371,26 @@
       </fieldset>
       <p class="form-help">Cabin types and prices depend on the vessel. AMHS will show the cabins actually available after you select the sailing.</p>
       <div class="autofill-setup">
-        <strong>One-time setup for automatic transfer</strong>
-        In Chrome or Edge, show your bookmarks bar, then drag the button below onto it. On each AMHS screen, click that bookmark to fill or select the saved choices.
-        <br><a class="bookmarklet" id="autofill-bookmark" href="#" title="Drag this button to your bookmarks bar">AMHS Autofill</a>
+        <strong>Automatic AMHS transfer</strong>
+        Install the small Chrome or Edge extension once. After that, your choices transfer automatically when AMHS opens.
+        <br><a class="extension-download" href="./downloads/alaska-ferry-transfer-extension.zip" download>Download extension</a>
+        <p class="extension-status" id="extension-status">Extension not detected yet.</p>
+        <details class="install-steps">
+          <summary>Show installation steps</summary>
+          <ol>
+            <li>Unzip the downloaded file.</li>
+            <li>Open <strong>chrome://extensions</strong> or <strong>edge://extensions</strong>.</li>
+            <li>Turn on Developer mode and choose <strong>Load unpacked</strong>.</li>
+            <li>Select the unzipped extension folder, then reload this page.</li>
+          </ol>
+        </details>
       </div>
       <p class="form-error" id="reservation-error" role="alert"></p>
       <div class="reservation-actions">
         <button class="secondary-action" id="copy-reservation" type="button">Copy details</button>
         <button class="primary-action" id="continue-reservation" type="button">Continue at AMHS ↗</button>
       </div>
-      <p class="handoff-note">Your choices will be copied and the official AMHS booking system will open. Click your AMHS Autofill bookmark on the search, availability, and cabin screens. Review every selection, then enter traveler names and payment directly with AMHS. Larry’s Server does not receive or store personal or payment information.</p>
+      <p class="handoff-note">The extension fills the official AMHS search and selects the matching sailing and cabin automatically. Review every selection, then enter traveler names and payment directly with AMHS. Larry’s Server does not receive or store personal or payment information.</p>
     </form>
   </dialog>
 
@@ -384,7 +399,6 @@
     These are published sailing dates, not live passenger or vehicle availability. Schedules can change. Confirm your sailing and complete your reservation with Alaska Marine Highway.
   </section>
 
-  <script src="./amhs-autofill.js"></script>
   <script>
     const apiBase = "/projects/alaska-ferry-days/api";
     const month = document.getElementById("month");
@@ -551,6 +565,27 @@
       }
     }
 
+    function reservationTransferToken(details) {
+      const marker = "ALASKA_FERRY_AUTOFILL_V1:";
+      const payloadLine = details.split("\n").find((line) => line.startsWith(marker));
+      if (!payloadLine) throw new Error("The reservation details could not be prepared for transfer.");
+      const bytes = new TextEncoder().encode(payloadLine.slice(marker.length));
+      let binary = "";
+      bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+      return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    }
+
+    function extensionInstalled() {
+      return document.documentElement.dataset.alaskaFerryTransferExtension === "installed";
+    }
+
+    function updateExtensionStatus() {
+      const status = document.getElementById("extension-status");
+      const installed = extensionInstalled();
+      status.textContent = installed ? "Extension installed and ready." : "Extension not detected yet.";
+      status.classList.toggle("ready", installed);
+    }
+
     async function loadDestinations(preferredValue = "") {
       const from = departure.value;
       destination.disabled = true;
@@ -653,28 +688,31 @@
     });
     document.getElementById("copy-reservation").addEventListener("click", copyReservationDetails);
     document.getElementById("continue-reservation").addEventListener("click", async () => {
+      let details;
       try {
-        reservationDetails();
+        details = reservationDetails();
       } catch (error) {
         reservationError.textContent = error.message;
         return;
       }
-      const officialWindow = window.open("https://bookamhs.alaska.gov/book/sailing-search/journeySearch/?clear", "_blank");
+      const token = reservationTransferToken(details);
+      const officialUrl = `https://bookamhs.alaska.gov/book/sailing-search/journeySearch/?clear#afd=${token}`;
+      const officialWindow = window.open(officialUrl, "_blank");
       if (officialWindow) officialWindow.opener = null;
       const copied = await copyReservationDetails();
       reservationError.textContent = officialWindow
-        ? (copied ? "AMHS opened. Click your AMHS Autofill bookmark on that page." : "AMHS opened. Keep this window available while entering the details.")
+        ? (extensionInstalled()
+          ? "AMHS opened. The extension will transfer your choices automatically."
+          : "AMHS opened, but the extension was not detected. Install it and reload this page for automatic transfer.")
         : "Your browser blocked the new tab. Allow pop-ups, then try again.";
+      if (!copied && officialWindow && !extensionInstalled()) {
+        reservationError.textContent += " Keep this page open while entering the choices manually.";
+      }
     });
 
     async function initialize() {
       try {
-        const bookmark = document.getElementById("autofill-bookmark");
-        bookmark.href = window.alaskaFerryAutofillBookmarklet;
-        bookmark.addEventListener("click", (event) => {
-          event.preventDefault();
-          reservationError.textContent = "Drag AMHS Autofill to your bookmarks bar; do not click it on this page.";
-        });
+        updateExtensionStatus();
         const data = await getJson("/ports");
         portNames = Object.fromEntries(data.ports.map((port) => [port.code, port.name]));
         setOptions(month, data.months, "All published months");
@@ -690,6 +728,7 @@
       }
     }
 
+    window.addEventListener("alaska-ferry-transfer-ready", updateExtensionStatus);
     initialize();
   </script>
 </body>

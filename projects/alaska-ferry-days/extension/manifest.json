@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Alaska Ferry Transfer",
+  "version": "1.0.0",
+  "description": "Transfers trip choices from Alaska Ferry Days into the official AMHS reservation pages.",
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": ["https://larrysserver-production.up.railway.app/projects/alaska-ferry-days/*"],
+      "js": ["app-bridge.js"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://bookamhs.alaska.gov/book/sailing-search/*"],
+      "js": ["amhs-content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
